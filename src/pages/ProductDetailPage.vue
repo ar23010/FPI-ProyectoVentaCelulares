@@ -247,7 +247,7 @@ const similarProducts = ref([])
 const loadProduct = () => {
   const productId = parseInt(route.params.id)
   
-  // Datos de ejemplo
+  // Datos de ejemplo - deben coincidir con ProductListPage.vue
   const mockProducts = [
     {
       id: 1,
@@ -281,20 +281,117 @@ const loadProduct = () => {
       ram: '12GB',
       color: 'Negro fantasma',
       location: 'Santa Ana',
-      description: 'Samsung Galaxy S23 Ultra 512GB nuevo. Cámara de 200MP, S Pen incluido, batería de 5000mAh.',
+      description: 'Samsung Galaxy S23 Ultra 512GB nuevo. Cámara de 200MP, S Pen incluido, batería de 5000mAh. Pantalla Dynamic AMOLED 2X de 6.8 pulgadas con 120Hz. Procesador Snapdragon 8 Gen 2.',
       images: [
         'https://placehold.co/800x600/2ecc71/ffffff?text=Galaxy+S23+1',
-        'https://placehold.co/800x600/2ecc71/ffffff?text=Galaxy+S23+2'
+        'https://placehold.co/800x600/2ecc71/ffffff?text=Galaxy+S23+2',
+        'https://placehold.co/800x600/2ecc71/ffffff?text=Galaxy+S23+3'
       ],
       seller: {
         name: 'María González',
         rating: 4.9,
         reviews: 67
       }
+    },
+    {
+      id: 3,
+      name: 'Xiaomi 13 Pro',
+      brand: 'Xiaomi',
+      price: 800,
+      condition: 'Como nuevo',
+      storage: '256GB',
+      ram: '12GB',
+      color: 'Negro',
+      location: 'San Miguel',
+      description: 'Xiaomi 13 Pro 256GB, usado solo 2 meses. Como nuevo, sin rayones ni golpes. Incluye caja original y todos los accesorios. Cámara Leica, procesador Snapdragon 8 Gen 2, pantalla AMOLED de 6.73 pulgadas.',
+      images: [
+        'https://placehold.co/800x600/e74c3c/ffffff?text=Xiaomi+13+1',
+        'https://placehold.co/800x600/e74c3c/ffffff?text=Xiaomi+13+2',
+        'https://placehold.co/800x600/e74c3c/ffffff?text=Xiaomi+13+3'
+      ],
+      seller: {
+        name: 'Carlos Martínez',
+        rating: 4.7,
+        reviews: 32
+      }
+    },
+    {
+      id: 4,
+      name: 'iPhone 13',
+      brand: 'Apple',
+      price: 850,
+      condition: 'Usado - Buen estado',
+      storage: '128GB',
+      ram: '4GB',
+      color: 'Azul',
+      location: 'San Salvador',
+      description: 'iPhone 13 128GB en excelente estado. Batería al 92%. Sin golpes ni rayones. Incluye cargador. Chip A15 Bionic, sistema de cámara dual, pantalla Super Retina XDR de 6.1 pulgadas.',
+      images: [
+        'https://placehold.co/800x600/9b59b6/ffffff?text=iPhone+13+1',
+        'https://placehold.co/800x600/9b59b6/ffffff?text=iPhone+13+2'
+      ],
+      seller: {
+        name: 'Ana López',
+        rating: 4.6,
+        reviews: 28
+      }
+    },
+    {
+      id: 5,
+      name: 'Samsung Galaxy A54',
+      brand: 'Samsung',
+      price: 400,
+      condition: 'Nuevo',
+      storage: '128GB',
+      ram: '8GB',
+      color: 'Violeta',
+      location: 'La Libertad',
+      description: 'Samsung Galaxy A54 5G 128GB completamente nuevo en caja sellada. Cámara de 50MP, batería de 5000mAh, pantalla Super AMOLED de 6.4 pulgadas con 120Hz. Procesador Exynos 1380.',
+      images: [
+        'https://placehold.co/800x600/f39c12/ffffff?text=Galaxy+A54+1',
+        'https://placehold.co/800x600/f39c12/ffffff?text=Galaxy+A54+2'
+      ],
+      seller: {
+        name: 'Roberto Flores',
+        rating: 4.8,
+        reviews: 51
+      }
+    },
+    {
+      id: 6,
+      name: 'Motorola Edge 40',
+      brand: 'Motorola',
+      price: 500,
+      condition: 'Nuevo',
+      storage: '256GB',
+      ram: '8GB',
+      color: 'Eclipse Black',
+      location: 'Sonsonate',
+      description: 'Motorola Edge 40 256GB nuevo en caja. Pantalla pOLED de 6.55 pulgadas con 144Hz, cámara de 50MP con OIS, procesador MediaTek Dimensity 8020, carga rápida de 68W.',
+      images: [
+        'https://placehold.co/800x600/1abc9c/ffffff?text=Moto+Edge+1',
+        'https://placehold.co/800x600/1abc9c/ffffff?text=Moto+Edge+2'
+      ],
+      seller: {
+        name: 'Luis Ramírez',
+        rating: 4.7,
+        reviews: 39
+      }
     }
   ]
 
-  product.value = mockProducts.find(p => p.id === productId) || mockProducts[0]
+  product.value = mockProducts.find(p => p.id === productId)
+  
+  // Si no se encuentra el producto, mostrar error o redirigir
+  if (!product.value) {
+    $q.notify({
+      message: 'Producto no encontrado',
+      color: 'negative',
+      position: 'top'
+    })
+    router.push('/productos')
+    return
+  }
   
   // Cargar productos similares
   similarProducts.value = mockProducts.filter(p => p.id !== productId).slice(0, 4)
