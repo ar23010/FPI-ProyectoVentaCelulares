@@ -1,0 +1,344 @@
+<template>
+  <q-page padding>
+    <!-- Barra de búsqueda y filtros -->
+    <div class="q-mb-lg">
+      <div class="row q-col-gutter-md">
+        <div class="col-12 col-md-8">
+          <q-input
+            v-model="searchQuery"
+            outlined
+            placeholder="Buscar celulares..."
+            @update:model-value="filterProducts"
+          >
+            <template v-slot:prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </div>
+        <div class="col-12 col-md-4">
+          <q-select
+            v-model="sortOption"
+            outlined
+            :options="sortOptions"
+            label="Ordenar por"
+            @update:model-value="sortProducts"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros laterales -->
+    <div class="row q-col-gutter-md">
+      <div class="col-12 col-md-3">
+        <q-card flat bordered>
+          <q-card-section>
+            <div class="text-h6 q-mb-md">Filtros</div>
+            
+            <!-- Filtro por marca -->
+            <div class="q-mb-md">
+              <div class="text-subtitle2 q-mb-sm">Marca</div>
+              <q-option-group
+                v-model="selectedBrands"
+                :options="brands"
+                type="checkbox"
+                color="primary"
+                @update:model-value="filterProducts"
+              />
+            </div>
+
+            <!-- Filtro por rango de precio -->
+            <div class="q-mb-md">
+              <div class="text-subtitle2 q-mb-sm">Rango de precio</div>
+              <q-range
+                v-model="priceRange"
+                :min="0"
+                :max="2000"
+                :step="50"
+                label
+                color="primary"
+                @update:model-value="filterProducts"
+              />
+              <div class="text-caption q-mt-sm">
+                ${{ priceRange.min }} - ${{ priceRange.max }}
+              </div>
+            </div>
+
+            <!-- Filtro por condición -->
+            <div class="q-mb-md">
+              <div class="text-subtitle2 q-mb-sm">Condición</div>
+              <q-option-group
+                v-model="selectedConditions"
+                :options="conditions"
+                type="checkbox"
+                color="primary"
+                @update:model-value="filterProducts"
+              />
+            </div>
+
+            <q-btn
+              flat
+              color="primary"
+              label="Limpiar filtros"
+              class="full-width"
+              @click="clearFilters"
+            />
+          </q-card-section>
+        </q-card>
+      </div>
+
+      <!-- Listado de productos -->
+      <div class="col-12 col-md-9">
+        <div class="row q-col-gutter-md">
+          <div
+            v-for="product in filteredProducts"
+            :key="product.id"
+            class="col-12 col-sm-6 col-md-4"
+          >
+            <q-card
+              class="product-card cursor-pointer"
+              @click="goToProductDetail(product.id)"
+            >
+              <q-img
+                :src="product.image"
+                :ratio="4/3"
+                spinner-color="primary"
+              >
+                <div class="absolute-top-right q-ma-sm">
+                  <q-badge :color="product.condition === 'Nuevo' ? 'positive' : 'info'">
+                    {{ product.condition }}
+                  </q-badge>
+                </div>
+              </q-img>
+
+              <q-card-section>
+                <div class="text-h6">{{ product.name }}</div>
+                <div class="text-caption text-grey">{{ product.brand }}</div>
+                <div class="text-h5 text-primary q-mt-sm">
+                  ${{ product.price.toLocaleString() }}
+                </div>
+              </q-card-section>
+
+              <q-card-section class="q-pt-none">
+                <div class="text-caption">
+                  <q-icon name="location_on" size="xs" />
+                  {{ product.location }}
+                </div>
+              </q-card-section>
+
+              <q-card-actions align="right">
+                <q-btn
+                  flat
+                  color="primary"
+                  label="Ver detalles"
+                  @click.stop="goToProductDetail(product.id)"
+                />
+              </q-card-actions>
+            </q-card>
+          </div>
+        </div>
+
+        <!-- Mensaje cuando no hay resultados -->
+        <div v-if="filteredProducts.length === 0" class="text-center q-pa-xl">
+          <q-icon name="search_off" size="4rem" color="grey-5" />
+          <div class="text-h6 text-grey q-mt-md">
+            No se encontraron productos
+          </div>
+          <div class="text-body2 text-grey-6">
+            Intenta ajustar los filtros de búsqueda
+          </div>
+        </div>
+      </div>
+    </div>
+  </q-page>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+// Estado de búsqueda y filtros
+const searchQuery = ref('')
+const sortOption = ref('Más recientes')
+const selectedBrands = ref([])
+const selectedConditions = ref([])
+const priceRange = ref({ min: 0, max: 2000 })
+
+// Opciones de filtros
+const sortOptions = [
+  'Más recientes',
+  'Menor precio',
+  'Mayor precio',
+  'Más populares'
+]
+
+const brands = [
+  { label: 'Apple', value: 'Apple' },
+  { label: 'Samsung', value: 'Samsung' },
+  { label: 'Xiaomi', value: 'Xiaomi' },
+  { label: 'Huawei', value: 'Huawei' },
+  { label: 'Motorola', value: 'Motorola' },
+  { label: 'OnePlus', value: 'OnePlus' }
+]
+
+const conditions = [
+  { label: 'Nuevo', value: 'Nuevo' },
+  { label: 'Como nuevo', value: 'Como nuevo' },
+  { label: 'Usado - Buen estado', value: 'Usado - Buen estado' },
+  { label: 'Usado - Aceptable', value: 'Usado - Aceptable' }
+]
+
+// Datos de ejemplo (en producción vendrían de una API)
+const allProducts = ref([
+  {
+    id: 1,
+    name: 'iPhone 14 Pro Max',
+    brand: 'Apple',
+    price: 1200,
+    condition: 'Nuevo',
+    image: 'https://placehold.co/600x400/3498db/ffffff?text=iPhone+14+Pro',
+    location: 'San Salvador',
+    description: 'iPhone 14 Pro Max 256GB, color morado'
+  },
+  {
+    id: 2,
+    name: 'Samsung Galaxy S23 Ultra',
+    brand: 'Samsung',
+    price: 1100,
+    condition: 'Nuevo',
+    image: 'https://placehold.co/600x400/2ecc71/ffffff?text=Galaxy+S23',
+    location: 'Santa Ana',
+    description: 'Samsung Galaxy S23 Ultra 512GB'
+  },
+  {
+    id: 3,
+    name: 'Xiaomi 13 Pro',
+    brand: 'Xiaomi',
+    price: 800,
+    condition: 'Como nuevo',
+    image: 'https://placehold.co/600x400/e74c3c/ffffff?text=Xiaomi+13',
+    location: 'San Miguel',
+    description: 'Xiaomi 13 Pro 256GB, usado 2 meses'
+  },
+  {
+    id: 4,
+    name: 'iPhone 13',
+    brand: 'Apple',
+    price: 850,
+    condition: 'Usado - Buen estado',
+    image: 'https://placehold.co/600x400/9b59b6/ffffff?text=iPhone+13',
+    location: 'San Salvador',
+    description: 'iPhone 13 128GB, excelente estado'
+  },
+  {
+    id: 5,
+    name: 'Samsung Galaxy A54',
+    brand: 'Samsung',
+    price: 400,
+    condition: 'Nuevo',
+    image: 'https://placehold.co/600x400/f39c12/ffffff?text=Galaxy+A54',
+    location: 'La Libertad',
+    description: 'Samsung Galaxy A54 5G 128GB'
+  },
+  {
+    id: 6,
+    name: 'Motorola Edge 40',
+    brand: 'Motorola',
+    price: 500,
+    condition: 'Nuevo',
+    image: 'https://placehold.co/600x400/1abc9c/ffffff?text=Moto+Edge',
+    location: 'Sonsonate',
+    description: 'Motorola Edge 40 256GB'
+  }
+])
+
+const filteredProducts = ref([...allProducts.value])
+
+// Funciones de filtrado
+const filterProducts = () => {
+  let filtered = [...allProducts.value]
+
+  // Filtrar por búsqueda
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(
+      p =>
+        p.name.toLowerCase().includes(query) ||
+        p.brand.toLowerCase().includes(query) ||
+        p.description.toLowerCase().includes(query)
+    )
+  }
+
+  // Filtrar por marca
+  if (selectedBrands.value.length > 0) {
+    filtered = filtered.filter(p =>
+      selectedBrands.value.includes(p.brand)
+    )
+  }
+
+  // Filtrar por condición
+  if (selectedConditions.value.length > 0) {
+    filtered = filtered.filter(p =>
+      selectedConditions.value.includes(p.condition)
+    )
+  }
+
+  // Filtrar por precio
+  filtered = filtered.filter(
+    p => p.price >= priceRange.value.min && p.price <= priceRange.value.max
+  )
+
+  filteredProducts.value = filtered
+  sortProducts()
+}
+
+const sortProducts = () => {
+  const sorted = [...filteredProducts.value]
+
+  switch (sortOption.value) {
+    case 'Menor precio':
+      sorted.sort((a, b) => a.price - b.price)
+      break
+    case 'Mayor precio':
+      sorted.sort((a, b) => b.price - a.price)
+      break
+    case 'Más populares':
+      // Aquí podrías ordenar por número de vistas o likes
+      break
+    case 'Más recientes':
+    default:
+      sorted.sort((a, b) => b.id - a.id)
+      break
+  }
+
+  filteredProducts.value = sorted
+}
+
+const clearFilters = () => {
+  searchQuery.value = ''
+  selectedBrands.value = []
+  selectedConditions.value = []
+  priceRange.value = { min: 0, max: 2000 }
+  filterProducts()
+}
+
+const goToProductDetail = (id) => {
+  router.push(`/producto/${id}`)
+}
+
+onMounted(() => {
+  filterProducts()
+})
+</script>
+
+<style scoped lang="scss">
+.product-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+</style>
