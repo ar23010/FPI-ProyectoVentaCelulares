@@ -2,10 +2,10 @@
   <q-page padding>
     <div class="row justify-center">
       <div class="col-12 col-md-8">
-        <q-card flat bordered>
+        <q-card flat bordered class="dark-card">
           <q-card-section>
-            <div class="text-h4 q-mb-md">Vender un celular</div>
-            <div class="text-body1 text-grey-7">
+            <div class="text-h4 q-mb-md text-white">Vender un celular</div>
+            <div class="text-body1 text-grey-5">
               Completa el formulario para publicar tu anuncio
             </div>
           </q-card-section>
@@ -143,7 +143,7 @@
                 :done="step > 3"
               >
                 <div class="q-gutter-md">
-                  <div class="text-body1 q-mb-md">
+                  <div class="text-body1 q-mb-md text-white">
                     Sube hasta 5 imágenes de tu producto
                   </div>
 
@@ -168,7 +168,7 @@
                       :key="index"
                       class="col-6 col-sm-4"
                     >
-                      <q-card flat bordered>
+                      <q-card flat bordered class="dark-card">
                         <q-img :src="preview" :ratio="1" />
                         <q-btn
                           round
@@ -402,3 +402,18 @@ const submitForm = () => {
   }, 2000)
 }
 </script>
+
+<style scoped lang="scss">
+.dark-card {
+  background: #0d1525 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid rgba(30, 58, 138, 0.15) !important;
+}
+
+.body--light .dark-card {
+  background: #a5d4fd !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
+  border: 1px solid rgba(30, 58, 138, 0.15) !important;
+}
+</style>

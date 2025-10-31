@@ -1,1 +1,349 @@
 // app global css in SCSS form
+
+// Variables para neumorphism - Azules muy oscuros y sobrios
+$neuro-bg-start: #0a1628;
+$neuro-bg-mid: #132863;
+$neuro-bg-end: #020617;
+$neuro-shadow-dark: rgba(0, 0, 0, 0.7);
+$neuro-shadow-light: rgba(30, 58, 138, 0.1);
+$neuro-highlight: rgba(30, 64, 175, 0.08);
+
+// Variables para modo claro - Azules sobrios
+$light-bg-start: #93c5fd;
+$light-bg-mid: #bfdbfe;
+$light-bg-end: #dbeafe;
+$light-shadow-dark: rgba(15, 23, 42, 0.35);
+$light-shadow-light: rgba(255, 255, 255, 0.85);
+
+// Fondo optimizado - MODO OSCURO (simplificado para mejor rendimiento)
+body.body--dark {
+  background: linear-gradient(135deg, #0a1628 0%, #0f2363 50%, #020617 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  position: relative;
+}
+
+// Fondo optimizado - MODO CLARO (simplificado)
+body.body--light {
+  background: linear-gradient(135deg, #93c5fd 0%, #bfdbfe 50%, #dbeafe 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  position: relative;
+}
+
+.q-page {
+  background: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+// Estilos para modo oscuro
+.q-dark {
+  background: transparent;
+}
+
+// ========== MODO OSCURO (Optimizado) ==========
+.body--dark {
+  // Cards optimizados - menos sombras
+  .q-card {
+    background: #0d1525 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(30, 58, 138, 0.15) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform;
+    
+    &:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7) !important;
+      transform: translateY(-2px);
+    }
+  }
+
+  // Header optimizado - sin blur
+  .q-header {
+    background: #0a1628 !important;
+    border-bottom: 1px solid rgba(30, 58, 138, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  // Drawer optimizado - sin blur
+  .q-drawer {
+    background: #0a1628 !important;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.5) !important;
+    border-right: 1px solid rgba(30, 58, 138, 0.2);
+  }
+
+  // Inputs optimizados - sin gradientes
+  .q-field--outlined .q-field__control,
+  .q-field--filled .q-field__control,
+  .q-field--standout .q-field__control {
+    background: #0d1525 !important;
+    border-radius: 12px !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(30, 58, 138, 0.2) !important;
+    transition: border-color 0.2s ease;
+    
+    &:before, &:after {
+      border: none !important;
+    }
+  }
+
+  .q-field--outlined .q-field__control:hover,
+  .q-field--filled .q-field__control:hover,
+  .q-field--standout .q-field__control:hover {
+    border-color: rgba(30, 58, 138, 0.3) !important;
+  }
+
+  .q-field--outlined.q-field--focused .q-field__control,
+  .q-field--filled.q-field--focused .q-field__control,
+  .q-field--standout.q-field--focused .q-field__control {
+    border-color: rgba(30, 64, 175, 0.5) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(30, 64, 175, 0.2) !important;
+  }
+
+  // Botones optimizados - sombras simples
+  .q-btn {
+    border-radius: 12px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    will-change: transform;
+    
+    &:hover {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6) !important;
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+      transform: translateY(0);
+    }
+  }
+
+  .q-btn--unelevated {
+    background: #1e40af !important;
+  }
+
+  .q-btn--outline {
+    background: transparent !important;
+    border: 2px solid rgba(30, 58, 138, 0.4) !important;
+    box-shadow: none !important;
+  }
+
+  .q-btn--flat {
+    box-shadow: none !important;
+    
+    &:hover {
+      background: rgba(30, 58, 138, 0.15) !important;
+    }
+  }
+
+  // Menú optimizado
+  .q-menu {
+    background: #0d1525 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7) !important;
+    border: 1px solid rgba(30, 58, 138, 0.2);
+  }
+}
+
+// ========== MODO CLARO (Optimizado) ==========
+.body--light {
+  // Cards optimizados - menos sombras
+  .q-card {
+    background: #a5d4fd !important;
+    border-radius: 20px !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
+    border: 1px solid rgba(30, 58, 138, 0.15) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform;
+    
+    &:hover {
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25) !important;
+      transform: translateY(-2px);
+    }
+  }
+
+  // Header optimizado - sin blur
+  .q-header {
+    background: #93c5fd !important;
+    border-bottom: 1px solid rgba(30, 58, 138, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15) !important;
+    
+    .q-toolbar-title, .q-btn {
+      color: #0f172a !important;
+    }
+  }
+
+  // Drawer optimizado - sin blur
+  .q-drawer {
+    background: #93c5fd !important;
+    box-shadow: 2px 0 8px rgba(15, 23, 42, 0.15) !important;
+    border-right: 1px solid rgba(30, 58, 138, 0.2);
+  }
+
+  // Inputs optimizados - sin gradientes
+  .q-field--outlined .q-field__control,
+  .q-field--filled .q-field__control,
+  .q-field--standout .q-field__control {
+    background: #b8dcfe !important;
+    border-radius: 12px !important;
+    box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.1) !important;
+    border: 1px solid rgba(30, 58, 138, 0.25) !important;
+    transition: border-color 0.2s ease;
+    
+    &:before, &:after {
+      border: none !important;
+    }
+  }
+
+  .q-field--outlined .q-field__control:hover,
+  .q-field--filled .q-field__control:hover,
+  .q-field--standout .q-field__control:hover {
+    border-color: rgba(30, 58, 138, 0.35) !important;
+  }
+
+  .q-field--outlined.q-field--focused .q-field__control,
+  .q-field--filled.q-field--focused .q-field__control,
+  .q-field--standout.q-field--focused .q-field__control {
+    border-color: rgba(30, 64, 175, 0.5) !important;
+    box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.1), 0 0 0 2px rgba(30, 64, 175, 0.2) !important;
+  }
+
+  // Botones optimizados - sombras simples
+  .q-btn {
+    border-radius: 12px !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2) !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    will-change: transform;
+    
+    &:hover {
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25) !important;
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25) !important;
+      transform: translateY(0);
+    }
+  }
+
+  .q-btn--unelevated {
+    background: #1e40af !important;
+    color: white !important;
+  }
+
+  .q-btn--outline {
+    background: transparent !important;
+    border: 2px solid rgba(30, 58, 138, 0.4) !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+  }
+
+  .q-btn--flat {
+    box-shadow: none !important;
+    
+    &:hover {
+      background: rgba(30, 58, 138, 0.12) !important;
+    }
+  }
+
+  // Menú optimizado
+  .q-menu {
+    background: #a5d4fd !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
+    border: 1px solid rgba(30, 58, 138, 0.2);
+  }
+
+  // Textos en modo claro
+  .text-white {
+    color: #0f172a !important;
+  }
+
+  .text-grey-5 {
+    color: #334155 !important;
+  }
+}
+
+// Mejorar contraste de texto - modo oscuro
+.body--dark {
+  .text-grey,
+  .text-grey-7,
+  .text-grey-6 {
+    color: rgba(255, 255, 255, 0.75) !important;
+  }
+
+  .text-grey-5 {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .text-grey-8 {
+    color: rgba(255, 255, 255, 0.95) !important;
+  }
+}
+
+// Separadores optimizados - sin gradientes
+.q-separator {
+  background: rgba(30, 58, 138, 0.2) !important;
+  height: 1px !important;
+  box-shadow: none;
+}
+
+.body--light .q-separator {
+  background: rgba(30, 58, 138, 0.25) !important;
+}
+
+// Badges optimizados
+.q-badge {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+// Carousel optimizado
+.q-carousel {
+  border-radius: 20px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.body--light .q-carousel {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
+}
+
+// Toolbar neumórfico
+.q-toolbar {
+  background: transparent !important;
+}
+
+// Items optimizados
+.q-item {
+  border-radius: 8px !important;
+  transition: background-color 0.15s ease;
+  
+  &:hover {
+    background: rgba(30, 58, 138, 0.12) !important;
+  }
+}
+
+.body--light .q-item:hover {
+  background: rgba(30, 58, 138, 0.1) !important;
+}
+
+// Stepper neumórfico
+.q-stepper {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.q-stepper__step {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+// List items neumórficos
+.q-list {
+  background: transparent !important;
+}
+
+.q-item__label--caption {
+  color: rgba(255, 255, 255, 0.6) !important;
+}

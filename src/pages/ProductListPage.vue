@@ -30,25 +30,26 @@
     <!-- Filtros laterales -->
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-3">
-        <q-card flat bordered>
+        <q-card flat bordered class="dark-card">
           <q-card-section>
-            <div class="text-h6 q-mb-md">Filtros</div>
+            <div class="text-h6 q-mb-md text-white">Filtros</div>
             
             <!-- Filtro por marca -->
             <div class="q-mb-md">
-              <div class="text-subtitle2 q-mb-sm">Marca</div>
+              <div class="text-subtitle2 q-mb-sm text-white">Marca</div>
               <q-option-group
                 v-model="selectedBrands"
                 :options="brands"
                 type="checkbox"
                 color="primary"
+                dark
                 @update:model-value="filterProducts"
               />
             </div>
 
             <!-- Filtro por rango de precio -->
             <div class="q-mb-md">
-              <div class="text-subtitle2 q-mb-sm">Rango de precio</div>
+              <div class="text-subtitle2 q-mb-sm text-white">Rango de precio</div>
               <q-range
                 v-model="priceRange"
                 :min="0"
@@ -65,12 +66,13 @@
 
             <!-- Filtro por condición -->
             <div class="q-mb-md">
-              <div class="text-subtitle2 q-mb-sm">Condición</div>
+              <div class="text-subtitle2 q-mb-sm text-white">Condición</div>
               <q-option-group
                 v-model="selectedConditions"
                 :options="conditions"
                 type="checkbox"
                 color="primary"
+                dark
                 @update:model-value="filterProducts"
               />
             </div>
@@ -95,7 +97,7 @@
             class="col-12 col-sm-6 col-md-4"
           >
             <q-card
-              class="product-card cursor-pointer"
+              class="product-card cursor-pointer dark-card"
               @click="goToProductDetail(product.id)"
             >
               <q-img
@@ -111,15 +113,15 @@
               </q-img>
 
               <q-card-section>
-                <div class="text-h6">{{ product.name }}</div>
-                <div class="text-caption text-grey">{{ product.brand }}</div>
+                <div class="text-h6 text-white">{{ product.name }}</div>
+                <div class="text-caption text-grey-5">{{ product.brand }}</div>
                 <div class="text-h5 text-primary q-mt-sm">
                   ${{ product.price.toLocaleString() }}
                 </div>
               </q-card-section>
 
               <q-card-section class="q-pt-none">
-                <div class="text-caption">
+                <div class="text-caption text-grey-5">
                   <q-icon name="location_on" size="xs" />
                   {{ product.location }}
                 </div>
@@ -140,10 +142,10 @@
         <!-- Mensaje cuando no hay resultados -->
         <div v-if="filteredProducts.length === 0" class="text-center q-pa-xl">
           <q-icon name="search_off" size="4rem" color="grey-5" />
-          <div class="text-h6 text-grey q-mt-md">
+          <div class="text-h6 text-white q-mt-md">
             No se encontraron productos
           </div>
-          <div class="text-body2 text-grey-6">
+          <div class="text-body2 text-grey-5">
             Intenta ajustar los filtros de búsqueda
           </div>
         </div>
@@ -334,11 +336,33 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .product-card {
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease;
+  border-radius: 20px !important;
+  will-change: transform;
   
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
   }
+}
+
+.body--dark .product-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8) !important;
+}
+
+.body--light .product-card:hover {
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3) !important;
+}
+
+.dark-card {
+  background: #0d1525 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid rgba(30, 58, 138, 0.15) !important;
+}
+
+.body--light .dark-card {
+  background: #a5d4fd !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
+  border: 1px solid rgba(30, 58, 138, 0.15) !important;
 }
 </style>

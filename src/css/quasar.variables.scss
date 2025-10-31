@@ -1,4 +1,4 @@
-// Quasar SCSS (& Sass) Variables
+    // Quasar SCSS (& Sass) Variables
 // --------------------------------------------------
 // To customize the look and feel of this app, you can override
 // the Sass/SCSS variables found in Quasar's source Sass/SCSS files.
@@ -12,14 +12,26 @@
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
-$primary: #1976d2;
-$secondary: #26a69a;
-$accent: #9c27b0;
+// Tema neumórfico - Azules muy oscuros y sobrios
+$primary: #1e40af;
+$secondary: #1e3a8a;
+$accent: #3b82f6;
 
-$dark: #1d1d1d;
-$dark-page: #121212;
+$dark: #0a1628;
+$dark-page: #030712;
 
-$positive: #21ba45;
-$negative: #c10015;
-$info: #31ccec;
-$warning: #f2c037;
+$positive: #66bb6a;
+$negative: #ef5350;
+$info: #1e40af;
+$warning: #ffa726;
+
+// Colores personalizados para neumorphism - Azules muy oscuros y sobrios
+$neuro-base: #0a1628;
+$neuro-light: #1e3a8a;
+$neuro-dark: #020617;
+$neuro-highlight: #1e40af;
+
+// Colores para modo claro - Azules más oscuros y sobrios
+$light-bg: #bfdbfe;
+$light-surface: #dbeafe;
+$light-primary: #1e3a8a;

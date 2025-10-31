@@ -3,7 +3,7 @@
     <div v-if="product" class="row q-col-gutter-lg">
       <!-- Galería de imágenes -->
       <div class="col-12 col-md-6">
-        <q-card flat bordered>
+        <q-card flat bordered class="dark-card">
           <q-carousel
             v-model="currentSlide"
             animated
@@ -26,10 +26,10 @@
 
       <!-- Información del producto -->
       <div class="col-12 col-md-6">
-        <q-card flat bordered>
+        <q-card flat bordered class="dark-card">
           <q-card-section>
             <div class="row items-center justify-between q-mb-md">
-              <div class="text-h4">{{ product.name }}</div>
+              <div class="text-h4 text-white">{{ product.name }}</div>
               <q-btn
                 flat
                 round
@@ -47,8 +47,8 @@
 
             <!-- Especificaciones -->
             <div class="q-mb-md">
-              <div class="text-h6 q-mb-sm">Especificaciones</div>
-              <q-list dense>
+              <div class="text-h6 q-mb-sm text-white">Especificaciones</div>
+              <q-list dense dark>
                 <q-item>
                   <q-item-section>
                     <q-item-label caption>Marca</q-item-label>
@@ -99,22 +99,22 @@
 
             <!-- Descripción -->
             <div class="q-mb-md">
-              <div class="text-h6 q-mb-sm">Descripción</div>
-              <p class="text-body1">{{ product.description }}</p>
+              <div class="text-h6 q-mb-sm text-white">Descripción</div>
+              <p class="text-body1 text-grey-5">{{ product.description }}</p>
             </div>
 
             <q-separator class="q-my-md" />
 
             <!-- Información del vendedor -->
             <div class="q-mb-md">
-              <div class="text-h6 q-mb-sm">Vendedor</div>
+              <div class="text-h6 q-mb-sm text-white">Vendedor</div>
               <div class="row items-center q-gutter-sm">
                 <q-avatar size="50px" color="primary" text-color="white">
                   {{ product.seller.name.charAt(0) }}
                 </q-avatar>
                 <div>
-                  <div class="text-subtitle1">{{ product.seller.name }}</div>
-                  <div class="text-caption text-grey">
+                  <div class="text-subtitle1 text-white">{{ product.seller.name }}</div>
+                  <div class="text-caption text-grey-5">
                     <q-icon name="star" color="orange" size="xs" />
                     {{ product.seller.rating }} ({{ product.seller.reviews }} reseñas)
                   </div>
@@ -150,7 +150,7 @@
 
     <!-- Productos similares -->
     <div class="q-mt-xl">
-      <div class="text-h5 q-mb-md">Productos similares</div>
+      <div class="text-h5 q-mb-md text-white">Productos similares</div>
       <div class="row q-col-gutter-md">
         <div
           v-for="similar in similarProducts"
@@ -158,12 +158,12 @@
           class="col-12 col-sm-6 col-md-3"
         >
           <q-card
-            class="cursor-pointer"
+            class="cursor-pointer dark-card"
             @click="goToProduct(similar.id)"
           >
             <q-img :src="similar.image" :ratio="4/3" />
             <q-card-section>
-              <div class="text-subtitle1">{{ similar.name }}</div>
+              <div class="text-subtitle1 text-white">{{ similar.name }}</div>
               <div class="text-h6 text-primary">${{ similar.price.toLocaleString() }}</div>
             </q-card-section>
           </q-card>
@@ -466,3 +466,27 @@ onMounted(() => {
   loadProduct()
 })
 </script>
+
+<style scoped lang="scss">
+.dark-card {
+  background: #0d1525 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid rgba(30, 58, 138, 0.15) !important;
+  transition: box-shadow 0.2s ease;
+  
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7) !important;
+  }
+}
+
+.body--light .dark-card {
+  background: #a5d4fd !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
+  border: 1px solid rgba(30, 58, 138, 0.15) !important;
+  
+  &:hover {
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25) !important;
+  }
+}
+</style>
