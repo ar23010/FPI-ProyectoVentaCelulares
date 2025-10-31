@@ -346,23 +346,25 @@ onMounted(() => {
 }
 
 .body--dark .product-card:hover {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .body--light .product-card:hover {
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
 }
 
 .dark-card {
-  background: #0d1525 !important;
+  background: #0a0e1a !important;
   border-radius: 20px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
-  border: 1px solid rgba(30, 58, 138, 0.15) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .body--light .dark-card {
-  background: #a5d4fd !important;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
-  border: 1px solid rgba(30, 58, 138, 0.15) !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
 }
 </style>

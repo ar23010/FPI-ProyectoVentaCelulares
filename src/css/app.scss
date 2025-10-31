@@ -1,32 +1,27 @@
 // app global css in SCSS form
 
-// Variables para neumorphism - Azules muy oscuros y sobrios
-$neuro-bg-start: #0a1628;
-$neuro-bg-mid: #132863;
-$neuro-bg-end: #020617;
-$neuro-shadow-dark: rgba(0, 0, 0, 0.7);
-$neuro-shadow-light: rgba(30, 58, 138, 0.1);
-$neuro-highlight: rgba(30, 64, 175, 0.08);
+// Variables rediseñadas - Negro con highlights blancos / Blanco con highlights azules
+$dark-bg: #020617;
+$dark-surface: #0a0e1a;
+$dark-highlight: #ffffff;
+$dark-shadow: rgba(0, 0, 0, 0.5);
 
-// Variables para modo claro - Azules sobrios
-$light-bg-start: #93c5fd;
-$light-bg-mid: #bfdbfe;
-$light-bg-end: #dbeafe;
-$light-shadow-dark: rgba(15, 23, 42, 0.35);
-$light-shadow-light: rgba(255, 255, 255, 0.85);
+// Variables para modo claro
+$light-bg: #ffffff;
+$light-surface: #f8fafc;
+$light-highlight: #3b82f6;
+$light-shadow: rgba(0, 0, 0, 0.1);
 
-// Fondo optimizado - MODO OSCURO (simplificado para mejor rendimiento)
+// Fondo - MODO OSCURO: #020617 con sutiles variaciones
 body.body--dark {
-  background: linear-gradient(135deg, #0a1628 0%, #0f2363 50%, #020617 100%);
-  background-attachment: fixed;
+  background: #020617;
   min-height: 100vh;
   position: relative;
 }
 
-// Fondo optimizado - MODO CLARO (simplificado)
+// Fondo - MODO CLARO: Blanco puro
 body.body--light {
-  background: linear-gradient(135deg, #93c5fd 0%, #bfdbfe 50%, #dbeafe 100%);
-  background-attachment: fixed;
+  background: #ffffff;
   min-height: 100vh;
   position: relative;
 }
@@ -42,45 +37,46 @@ body.body--light {
   background: transparent;
 }
 
-// ========== MODO OSCURO (Optimizado) ==========
+// ========== MODO OSCURO: #020617 con highlights blancos ==========
 .body--dark {
-  // Cards optimizados - menos sombras
+  // Cards - Negro con bordes blancos sutiles
   .q-card {
-    background: #0d1525 !important;
+    background: #0a0e1a !important;
     border-radius: 20px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
-    border: 1px solid rgba(30, 58, 138, 0.15) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     will-change: transform;
     
     &:hover {
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7) !important;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.9) !important;
+      border-color: rgba(255, 255, 255, 0.2) !important;
       transform: translateY(-2px);
     }
   }
 
-  // Header optimizado - sin blur
+  // Header - Negro con línea blanca
   .q-header {
-    background: #0a1628 !important;
-    border-bottom: 1px solid rgba(30, 58, 138, 0.2) !important;
+    background: #020617 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
   }
 
-  // Drawer optimizado - sin blur
+  // Drawer - Negro con borde blanco
   .q-drawer {
-    background: #0a1628 !important;
+    background: #020617 !important;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.5) !important;
-    border-right: 1px solid rgba(30, 58, 138, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
   }
 
-  // Inputs optimizados - sin gradientes
+  // Inputs - Negro con bordes blancos
   .q-field--outlined .q-field__control,
   .q-field--filled .q-field__control,
   .q-field--standout .q-field__control {
-    background: #0d1525 !important;
+    background: #0a0e1a !important;
     border-radius: 12px !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
-    border: 1px solid rgba(30, 58, 138, 0.2) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
     transition: border-color 0.2s ease;
     
     &:before, &:after {
@@ -91,104 +87,111 @@ body.body--light {
   .q-field--outlined .q-field__control:hover,
   .q-field--filled .q-field__control:hover,
   .q-field--standout .q-field__control:hover {
-    border-color: rgba(30, 58, 138, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
   }
 
   .q-field--outlined.q-field--focused .q-field__control,
   .q-field--filled.q-field--focused .q-field__control,
   .q-field--standout.q-field--focused .q-field__control {
-    border-color: rgba(30, 64, 175, 0.5) !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(30, 64, 175, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(255, 255, 255, 0.15) !important;
   }
 
-  // Botones optimizados - sombras simples
+  // Botones - Con highlights blancos
   .q-btn {
     border-radius: 12px !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6) !important;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     will-change: transform;
     
     &:hover {
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6) !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7) !important;
       transform: translateY(-1px);
     }
     
     &:active {
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7) !important;
       transform: translateY(0);
     }
   }
 
   .q-btn--unelevated {
-    background: #1e40af !important;
+    background: #ffffff !important;
+    color: #020617 !important;
   }
 
   .q-btn--outline {
     background: transparent !important;
-    border: 2px solid rgba(30, 58, 138, 0.4) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
     box-shadow: none !important;
+    
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.5) !important;
+    }
   }
 
   .q-btn--flat {
     box-shadow: none !important;
     
     &:hover {
-      background: rgba(30, 58, 138, 0.15) !important;
+      background: rgba(255, 255, 255, 0.1) !important;
     }
   }
 
-  // Menú optimizado
+  // Menú - Negro con borde blanco
   .q-menu {
-    background: #0d1525 !important;
+    background: #0a0e1a !important;
     border-radius: 12px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7) !important;
-    border: 1px solid rgba(30, 58, 138, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
 }
 
-// ========== MODO CLARO (Optimizado) ==========
+// ========== MODO CLARO: Blanco con highlights azules ==========
 .body--light {
-  // Cards optimizados - menos sombras
+  // Cards - Blanco con bordes azules
   .q-card {
-    background: #a5d4fd !important;
+    background: #ffffff !important;
     border-radius: 20px !important;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
-    border: 1px solid rgba(30, 58, 138, 0.15) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     will-change: transform;
     
     &:hover {
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25) !important;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+      border-color: rgba(59, 130, 246, 0.4) !important;
       transform: translateY(-2px);
     }
   }
 
-  // Header optimizado - sin blur
+  // Header - Blanco con línea azul
   .q-header {
-    background: #93c5fd !important;
-    border-bottom: 1px solid rgba(30, 58, 138, 0.2) !important;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15) !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
     
     .q-toolbar-title, .q-btn {
-      color: #0f172a !important;
+      color: #020617 !important;
     }
   }
 
-  // Drawer optimizado - sin blur
+  // Drawer - Blanco con borde azul
   .q-drawer {
-    background: #93c5fd !important;
-    box-shadow: 2px 0 8px rgba(15, 23, 42, 0.15) !important;
-    border-right: 1px solid rgba(30, 58, 138, 0.2);
+    background: #ffffff !important;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05) !important;
+    border-right: 1px solid rgba(59, 130, 246, 0.2);
   }
 
-  // Inputs optimizados - sin gradientes
+  // Inputs - Blanco con bordes azules
   .q-field--outlined .q-field__control,
   .q-field--filled .q-field__control,
   .q-field--standout .q-field__control {
-    background: #b8dcfe !important;
+    background: #f8fafc !important;
     border-radius: 12px !important;
-    box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.1) !important;
-    border: 1px solid rgba(30, 58, 138, 0.25) !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
     transition: border-color 0.2s ease;
     
     &:before, &:after {
@@ -199,69 +202,73 @@ body.body--light {
   .q-field--outlined .q-field__control:hover,
   .q-field--filled .q-field__control:hover,
   .q-field--standout .q-field__control:hover {
-    border-color: rgba(30, 58, 138, 0.35) !important;
+    border-color: rgba(59, 130, 246, 0.5) !important;
   }
 
   .q-field--outlined.q-field--focused .q-field__control,
   .q-field--filled.q-field--focused .q-field__control,
   .q-field--standout.q-field--focused .q-field__control {
-    border-color: rgba(30, 64, 175, 0.5) !important;
-    box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.1), 0 0 0 2px rgba(30, 64, 175, 0.2) !important;
+    border-color: rgba(59, 130, 246, 0.8) !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05), 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
   }
 
-  // Botones optimizados - sombras simples
+  // Botones - Azules con texto blanco
   .q-btn {
     border-radius: 12px !important;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     will-change: transform;
     
     &:hover {
-      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25) !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
       transform: translateY(-1px);
     }
     
     &:active {
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
       transform: translateY(0);
     }
   }
 
   .q-btn--unelevated {
-    background: #1e40af !important;
-    color: white !important;
+    background: #3b82f6 !important;
+    color: #ffffff !important;
   }
 
   .q-btn--outline {
     background: transparent !important;
-    border: 2px solid rgba(30, 58, 138, 0.4) !important;
-    color: #0f172a !important;
+    border: 2px solid rgba(59, 130, 246, 0.5) !important;
+    color: #3b82f6 !important;
     box-shadow: none !important;
+    
+    &:hover {
+      border-color: rgba(59, 130, 246, 0.8) !important;
+    }
   }
 
   .q-btn--flat {
     box-shadow: none !important;
     
     &:hover {
-      background: rgba(30, 58, 138, 0.12) !important;
+      background: rgba(59, 130, 246, 0.1) !important;
     }
   }
 
-  // Menú optimizado
+  // Menú - Blanco con borde azul
   .q-menu {
-    background: #a5d4fd !important;
+    background: #ffffff !important;
     border-radius: 12px !important;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2) !important;
-    border: 1px solid rgba(30, 58, 138, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2);
   }
 
   // Textos en modo claro
   .text-white {
-    color: #0f172a !important;
+    color: #020617 !important;
   }
 
   .text-grey-5 {
-    color: #334155 !important;
+    color: #64748b !important;
   }
 }
 
@@ -282,15 +289,17 @@ body.body--light {
   }
 }
 
-// Separadores optimizados - sin gradientes
-.q-separator {
-  background: rgba(30, 58, 138, 0.2) !important;
+// Separadores - Blancos en modo oscuro, azules en modo claro
+.body--dark .q-separator {
+  background: rgba(255, 255, 255, 0.15) !important;
   height: 1px !important;
   box-shadow: none;
 }
 
 .body--light .q-separator {
-  background: rgba(30, 58, 138, 0.25) !important;
+  background: rgba(59, 130, 246, 0.2) !important;
+  height: 1px !important;
+  box-shadow: none;
 }
 
 // Badges optimizados
@@ -315,18 +324,23 @@ body.body--light {
   background: transparent !important;
 }
 
-// Items optimizados
-.q-item {
+// Items - Highlights blancos/azules
+.body--dark .q-item {
   border-radius: 8px !important;
   transition: background-color 0.15s ease;
   
   &:hover {
-    background: rgba(30, 58, 138, 0.12) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
   }
 }
 
-.body--light .q-item:hover {
-  background: rgba(30, 58, 138, 0.1) !important;
+.body--light .q-item {
+  border-radius: 8px !important;
+  transition: background-color 0.15s ease;
+  
+  &:hover {
+    background: rgba(59, 130, 246, 0.08) !important;
+  }
 }
 
 // Stepper neumórfico

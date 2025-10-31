@@ -12,26 +12,26 @@
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
-// Tema neumórfico - Azules muy oscuros y sobrios
-$primary: #1e40af;
-$secondary: #1e3a8a;
-$accent: #3b82f6;
+// Tema rediseñado - Blanco/Negro con highlights
+$primary: #3b82f6;
+$secondary: #60a5fa;
+$accent: #2563eb;
 
-$dark: #0a1628;
-$dark-page: #030712;
+$dark: #020617;
+$dark-page: #020617;
 
 $positive: #66bb6a;
 $negative: #ef5350;
-$info: #1e40af;
+$info: #3b82f6;
 $warning: #ffa726;
 
-// Colores personalizados para neumorphism - Azules muy oscuros y sobrios
-$neuro-base: #0a1628;
-$neuro-light: #1e3a8a;
-$neuro-dark: #020617;
-$neuro-highlight: #1e40af;
+// Colores para modo oscuro - Negro con highlights blancos
+$neuro-base: #020617;
+$neuro-dark: #000000;
+$neuro-highlight: #ffffff;
+$neuro-accent: #f8fafc;
 
-// Colores para modo claro - Azules más oscuros y sobrios
-$light-bg: #bfdbfe;
-$light-surface: #dbeafe;
-$light-primary: #1e3a8a;
+// Colores para modo claro - Blanco con highlights azules
+$light-bg: #ffffff;
+$light-surface: #f8fafc;
+$light-primary: #3b82f6;

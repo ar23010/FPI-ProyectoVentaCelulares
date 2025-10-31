@@ -209,28 +209,28 @@
         <div class="footer-content">
           <div class="row justify-center q-gutter-md q-py-lg">
             <div class="col-12 col-sm-auto text-center">
-              <div class="text-weight-bold q-mb-sm text-white">Acerca de</div>
-              <div class="text-caption text-grey-5">Quiénes somos</div>
-              <div class="text-caption text-grey-5">Términos y condiciones</div>
-              <div class="text-caption text-grey-5">Política de privacidad</div>
+              <div class="text-weight-bold q-mb-sm footer-title">Acerca de</div>
+              <div class="text-caption footer-link">Quiénes somos</div>
+              <div class="text-caption footer-link">Términos y condiciones</div>
+              <div class="text-caption footer-link">Política de privacidad</div>
             </div>
             <div class="col-12 col-sm-auto text-center">
-              <div class="text-weight-bold q-mb-sm text-white">Ayuda</div>
-              <div class="text-caption text-grey-5">Centro de ayuda</div>
-              <div class="text-caption text-grey-5">Comprar</div>
-              <div class="text-caption text-grey-5">Vender</div>
+              <div class="text-weight-bold q-mb-sm footer-title">Ayuda</div>
+              <div class="text-caption footer-link">Centro de ayuda</div>
+              <div class="text-caption footer-link">Comprar</div>
+              <div class="text-caption footer-link">Vender</div>
             </div>
             <div class="col-12 col-sm-auto text-center">
-              <div class="text-weight-bold q-mb-sm text-white">Síguenos</div>
+              <div class="text-weight-bold q-mb-sm footer-title">Síguenos</div>
               <div class="q-gutter-sm">
-                <q-btn round dense flat icon="facebook" color="white" />
-                <q-btn round dense flat icon="email" color="white" />
-                <q-btn round dense flat icon="phone" color="white" />
+                <q-btn round dense flat icon="facebook" class="footer-social-btn" />
+                <q-btn round dense flat icon="email" class="footer-social-btn" />
+                <q-btn round dense flat icon="phone" class="footer-social-btn" />
               </div>
             </div>
           </div>
-          <q-separator class="q-my-sm" style="background: rgba(100, 181, 246, 0.3)" />
-          <div class="text-caption q-py-md text-center text-grey-5">
+          <q-separator class="footer-separator" />
+          <div class="text-caption q-py-md text-center footer-copyright">
             © 2025 CellPhone Market - El Salvador
           </div>
         </div>
@@ -356,15 +356,86 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.footer-section {
+// Footer - Modo Oscuro: Negro con highlights blancos
+.body--dark .footer-section {
   margin-top: 4rem;
   padding: 0;
-  background: linear-gradient(0deg, #0f172a 0%, #1e3a8a 100%);
-  border-top: none;
-  box-shadow: 
-    0 -8px 16px rgba(0, 0, 0, 0.4),
-    0 2px 8px rgba(100, 181, 246, 0.1) inset;
+  background: #0a0e1a;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.5);
   width: 100%;
+}
+
+.body--dark .footer-title {
+  color: #ffffff !important;
+}
+
+.body--dark .footer-link {
+  color: rgba(255, 255, 255, 0.7) !important;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: rgba(255, 255, 255, 1) !important;
+  }
+}
+
+.body--dark .footer-social-btn {
+  color: #ffffff !important;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+}
+
+.body--dark .footer-separator {
+  background: rgba(255, 255, 255, 0.15) !important;
+  margin: 0.5rem 0;
+}
+
+.body--dark .footer-copyright {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+// Footer - Modo Claro: Blanco con highlights azules
+.body--light .footer-section {
+  margin-top: 4rem;
+  padding: 0;
+  background: #f8fafc;
+  border-top: 1px solid rgba(59, 130, 246, 0.2);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+.body--light .footer-title {
+  color: #3b82f6 !important;
+}
+
+.body--light .footer-link {
+  color: #64748b !important;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: #3b82f6 !important;
+  }
+}
+
+.body--light .footer-social-btn {
+  color: #3b82f6 !important;
+  
+  &:hover {
+    background: rgba(59, 130, 246, 0.1) !important;
+  }
+}
+
+.body--light .footer-separator {
+  background: rgba(59, 130, 246, 0.2) !important;
+  margin: 0.5rem 0;
+}
+
+.body--light .footer-copyright {
+  color: #94a3b8 !important;
 }
 
 .footer-content {
@@ -381,17 +452,19 @@ onMounted(() => {
       border-radius: 12px;
       margin-bottom: 8px;
       transition: background-color 0.15s ease;
-      
-      &:hover {
-        background: rgba(30, 58, 138, 0.12);
-      }
     }
+  }
+}
+
+.body--dark .settings-card {
+  .theme-options .q-radio:hover {
+    background: rgba(255, 255, 255, 0.08);
   }
 }
 
 .body--light .settings-card {
   .theme-options .q-radio:hover {
-    background: rgba(30, 58, 138, 0.1);
+    background: rgba(59, 130, 246, 0.08);
   }
 }
 </style>
