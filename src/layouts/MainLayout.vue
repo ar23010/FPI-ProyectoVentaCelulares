@@ -48,8 +48,22 @@
           round
           icon="favorite_border"
           class="q-mr-sm"
+          @click="$router.push('/notificaciones')"
         >
           <q-badge color="red" floating>3</q-badge>
+          <q-tooltip>Notificaciones</q-tooltip>
+        </q-btn>
+
+        <q-btn
+          flat
+          dense
+          round
+          icon="shopping_cart"
+          class="q-mr-sm"
+          @click="$router.push('/carrito')"
+        >
+          <q-badge color="primary" floating>2</q-badge>
+          <q-tooltip>Carrito</q-tooltip>
         </q-btn>
 
         <q-btn
@@ -60,23 +74,23 @@
         >
           <q-menu>
             <q-list style="min-width: 200px">
-              <q-item clickable v-close-popup>
+              <q-item clickable v-close-popup @click="$router.push('/perfil')">
                 <q-item-section avatar>
                   <q-icon name="person" />
                 </q-item-section>
                 <q-item-section>Mi perfil</q-item-section>
               </q-item>
-              <q-item clickable v-close-popup>
+              <q-item clickable v-close-popup @click="$router.push('/historial')">
                 <q-item-section avatar>
-                  <q-icon name="shopping_bag" />
+                  <q-icon name="history" />
                 </q-item-section>
-                <q-item-section>Mis compras</q-item-section>
+                <q-item-section>Historial</q-item-section>
               </q-item>
-              <q-item clickable v-close-popup>
+              <q-item clickable v-close-popup @click="$router.push('/notificaciones')">
                 <q-item-section avatar>
-                  <q-icon name="sell" />
+                  <q-icon name="notifications" />
                 </q-item-section>
-                <q-item-section>Mis ventas</q-item-section>
+                <q-item-section>Notificaciones</q-item-section>
               </q-item>
               <q-separator />
               <q-item clickable @click="showSettingsDialog = true">

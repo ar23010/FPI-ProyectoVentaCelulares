@@ -146,16 +146,25 @@
                   <div class="text-body1 q-mb-md text-white">
                     Sube hasta 5 imágenes de tu producto
                   </div>
+                  
+                  <q-banner class="bg-info text-white q-mb-md" rounded>
+                    <template v-slot:avatar>
+                      <q-icon name="info" color="white" />
+                    </template>
+                    <strong>Modo de prueba:</strong> Puedes continuar sin imágenes. 
+                    Próximamente se integrará Firebase para gestión de imágenes.
+                  </q-banner>
 
                   <q-file
                     v-model="formData.images"
                     filled
                     multiple
                     accept="image/*"
-                    label="Seleccionar imágenes"
+                    label="Seleccionar imágenes (opcional para pruebas)"
                     max-files="5"
                     counter
                     @update:model-value="previewImages"
+                    hint="Puedes dejar este campo vacío por ahora"
                   >
                     <template v-slot:prepend>
                       <q-icon name="attach_file" />
@@ -194,7 +203,6 @@
                       color="primary"
                       label="Continuar"
                       @click="nextStep"
-                      :disable="imagePreviews.length === 0"
                     />
                   </q-stepper-navigation>
                 </div>

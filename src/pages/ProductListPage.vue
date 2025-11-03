@@ -100,17 +100,33 @@
               class="product-card cursor-pointer dark-card"
               @click="goToProductDetail(product.id)"
             >
-              <q-img
-                :src="product.image"
-                :ratio="4/3"
-                spinner-color="primary"
-              >
+              <!-- Imagen del producto o placeholder -->
+              <div v-if="product.image" class="product-image-container">
+                <q-img
+                  :src="product.image"
+                  :ratio="4/3"
+                  spinner-color="primary"
+                >
+                  <div class="absolute-top-right q-ma-sm">
+                    <q-badge :color="product.condition === 'Nuevo' ? 'positive' : 'info'">
+                      {{ product.condition }}
+                    </q-badge>
+                  </div>
+                </q-img>
+              </div>
+              
+              <!-- Placeholder cuando no hay imagen -->
+              <div v-else class="product-no-image">
+                <div class="no-image-content">
+                  <q-icon name="phone_android" size="4rem" color="grey-6" />
+                  <div class="text-caption text-grey-5 q-mt-sm">Sin imagen</div>
+                </div>
                 <div class="absolute-top-right q-ma-sm">
                   <q-badge :color="product.condition === 'Nuevo' ? 'positive' : 'info'">
                     {{ product.condition }}
                   </q-badge>
                 </div>
-              </q-img>
+              </div>
 
               <q-card-section>
                 <div class="text-h6 text-white">{{ product.name }}</div>
@@ -252,6 +268,16 @@ const allProducts = ref([
     image: 'https://placehold.co/600x400/1abc9c/ffffff?text=Moto+Edge',
     location: 'Sonsonate',
     description: 'Motorola Edge 40 256GB'
+  },
+  {
+    id: 7,
+    name: 'OnePlus 11 Pro',
+    brand: 'OnePlus',
+    price: 650,
+    condition: 'Como nuevo',
+    image: null, // Producto de prueba sin imagen
+    location: 'San Salvador',
+    description: 'OnePlus 11 Pro 256GB - Producto de prueba para integración Firebase'
   }
 ])
 
@@ -353,6 +379,50 @@ onMounted(() => {
 .body--light .product-card:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
   border-color: rgba(59, 130, 246, 0.4) !important;
+}
+
+// Placeholder para productos sin imagen - Modo Oscuro
+.body--dark .product-no-image {
+  position: relative;
+  height: 0;
+  padding-bottom: 75%; // Ratio 4:3
+  background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .no-image-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+}
+
+// Placeholder para productos sin imagen - Modo Claro
+.body--light .product-no-image {
+  position: relative;
+  height: 0;
+  padding-bottom: 75%; // Ratio 4:3
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .no-image-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+}
+
+.product-image-container {
+  position: relative;
 }
 
 .dark-card {

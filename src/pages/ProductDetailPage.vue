@@ -1,10 +1,12 @@
 <template>
   <q-page padding>
     <div v-if="product" class="row q-col-gutter-lg">
-      <!-- Galería de imágenes -->
+      <!-- Galería de imágenes o placeholder -->
       <div class="col-12 col-md-6">
         <q-card flat bordered class="dark-card">
+          <!-- Carousel si hay imágenes -->
           <q-carousel
+            v-if="product.images && product.images.length > 0"
             v-model="currentSlide"
             animated
             navigation
@@ -21,6 +23,15 @@
               :img-src="img"
             />
           </q-carousel>
+          
+          <!-- Placeholder si no hay imágenes -->
+          <div v-else class="product-detail-no-image">
+            <q-icon name="phone_android" size="8rem" color="grey-6" />
+            <div class="text-h6 text-grey-5 q-mt-md">Sin imagen disponible</div>
+            <div class="text-caption text-grey-6 q-mt-sm">
+              Integración con Firebase próximamente
+            </div>
+          </div>
         </q-card>
       </div>
 
@@ -377,6 +388,24 @@ const loadProduct = () => {
         rating: 4.7,
         reviews: 39
       }
+    },
+    {
+      id: 7,
+      name: 'OnePlus 11 Pro',
+      brand: 'OnePlus',
+      price: 650,
+      condition: 'Como nuevo',
+      storage: '256GB',
+      ram: '12GB',
+      color: 'Eternal Green',
+      location: 'San Salvador',
+      description: 'OnePlus 11 Pro 256GB en excelente estado, usado por 3 meses. Incluye cargador original de 100W, cable USB-C y caja. Pantalla AMOLED de 6.7 pulgadas con tecnología LTPO 3.0, cámara Hasselblad de 50MP con OIS. Procesador Snapdragon 8 Gen 2, batería de 5000mAh. Producto de prueba para integración con Firebase - imagen pendiente de subir.',
+      images: null, // Producto de prueba sin imagen
+      seller: {
+        name: 'Carlos Méndez',
+        rating: 4.9,
+        reviews: 67
+      }
     }
   ]
 
@@ -478,6 +507,32 @@ onMounted(() => {
   &:hover {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.9) !important;
     border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+}
+
+// Placeholder para detalle sin imagen - Modo Oscuro
+.body--dark .product-detail-no-image {
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+  border-radius: 20px;
+}
+
+// Placeholder para detalle sin imagen - Modo Claro
+.body--light .product-detail-no-image {
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: 20px;
+  
+  .text-grey-5, .text-grey-6 {
+    color: #64748b !important;
   }
 }
 

@@ -19,6 +19,22 @@ const routes = [
         path: 'vender', 
         component: () => import('pages/SellProductPage.vue') 
       },
+      { 
+        path: 'notificaciones', 
+        component: () => import('pages/NotificationsPage.vue') 
+      },
+      { 
+        path: 'perfil', 
+        component: () => import('pages/ProfilePage.vue') 
+      },
+      { 
+        path: 'carrito', 
+        component: () => import('pages/CartPage.vue') 
+      },
+      { 
+        path: 'historial', 
+        component: () => import('pages/HistoryPage.vue') 
+      },
     ],
   },
 
