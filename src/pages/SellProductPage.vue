@@ -152,33 +152,36 @@
                       <q-icon name="info" color="white" />
                     </template>
                     <strong>Modo de prueba:</strong> Puedes continuar sin imágenes. 
-                    Próximamente se integrará Firebase para gestión de imágenes.
+               
                   </q-banner>
 
+                
+
                   <q-file
-                    v-model="formData.images"
+                    v-model="selectedFiles"
                     filled
                     multiple
                     accept="image/*"
                     label="Seleccionar imágenes (opcional para pruebas)"
                     max-files="5"
                     counter
-                    @update:model-value="previewImages"
-                    hint="Puedes dejar este campo vacío por ahora"
+                    @update:model-value="handleImageSelection"
+                    hint="Puedes continuar sin imágenes"
+                    :disable="convertingImages"
                   >
                     <template v-slot:prepend>
                       <q-icon name="attach_file" />
                     </template>
                   </q-file>
 
-                  <div v-if="imagePreviews.length > 0" class="row q-col-gutter-md q-mt-md">
+                  <div v-if="formData.images.length > 0" class="row q-col-gutter-md q-mt-md">
                     <div
-                      v-for="(preview, index) in imagePreviews"
+                      v-for="(imageBase64, index) in formData.images"
                       :key="index"
                       class="col-6 col-sm-4"
                     >
                       <q-card flat bordered class="dark-card">
-                        <q-img :src="preview" :ratio="1" />
+                        <q-img :src="imageBase64" :ratio="1" />
                         <q-btn
                           round
                           size="sm"
@@ -275,6 +278,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { db } from 'boot/firebase'
+import { collection, addDoc } from "firebase/firestore"; 
+
+
 
 const router = useRouter()
 const $q = useQuasar()
@@ -291,14 +298,16 @@ const formData = ref({
   ram: '',
   color: '',
   description: '',
-  images: null,
+  images: [], 
   location: '',
   city: '',
   phone: '',
   acceptTerms: false
 })
 
-const imagePreviews = ref([])
+
+const selectedFiles = ref([]) 
+const convertingImages = ref(false)
 
 // Opciones
 const brands = [
@@ -366,48 +375,147 @@ const nextStep = () => {
   step.value++
 }
 
-const previewImages = () => {
-  imagePreviews.value = []
-  if (formData.value.images) {
-    const files = Array.isArray(formData.value.images)
-      ? formData.value.images
-      : [formData.value.images]
+
+// Manejar la selección de archivos y convertir a base64
+const handleImageSelection = async () => {
+  if (selectedFiles.value) {
+    convertingImages.value = true
+    formData.value.images = [] 
     
-    files.forEach(file => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        imagePreviews.value.push(e.target.result)
+    const files = Array.isArray(selectedFiles.value)
+      ? selectedFiles.value
+      : [selectedFiles.value]
+    
+    // Procesar archivos de forma secuencial
+    for (const file of files) {
+      try {
+        const base64 = await convertFileToBase64(file)
+        formData.value.images.push(base64) // Guardar directamente en formData.images
+      } catch (error) {
+        console.error('Error converting image to base64:', error)
+        $q.notify({
+          message: 'Error al procesar una imagen',
+          color: 'negative',
+          position: 'top'
+        })
       }
-      reader.readAsDataURL(file)
-    })
+    }
+    
+    convertingImages.value = false
   }
 }
+
+// Función auxiliar para convertir archivo a base64
+const convertFileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    
+    reader.onload = (e) => {
+      resolve(e.target.result)
+    }
+    
+    reader.onerror = (error) => {
+      reject(error)
+    }
+    
+    // Redimensionar imagen si es muy grande
+    if (file.size > 1024 * 1024) { // Si es mayor a 1MB
+      compressImage(file)
+        .then(compressedFile => {
+          reader.readAsDataURL(compressedFile)
+        })
+        .catch(() => {
+          // Si falla la compresión, usar archivo original
+          reader.readAsDataURL(file)
+        })
+    } else {
+      reader.readAsDataURL(file)
+    }
+  })
+}
+
+// Función para comprimir imágenes
+const compressImage = (file, maxWidth = 800, quality = 0.8) => {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+    
+    img.onload = () => {
+      const ratio = Math.min(maxWidth / img.width, maxWidth / img.height)
+      canvas.width = img.width * ratio
+      canvas.height = img.height * ratio
+      
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      
+      canvas.toBlob(resolve, 'image/jpeg', quality)
+    }
+    
+    img.src = URL.createObjectURL(file)
+  })
+}
+
+
 
 const removeImage = (index) => {
-  imagePreviews.value.splice(index, 1)
-  // También remover del array de archivos
-  if (Array.isArray(formData.value.images)) {
-    formData.value.images.splice(index, 1)
+  formData.value.images.splice(index, 1)
+  
+  // También remover del array de archivos seleccionados
+  if (Array.isArray(selectedFiles.value)) {
+    selectedFiles.value.splice(index, 1)
   }
 }
 
-const submitForm = () => {
+const submitForm = async () => {
   loading.value = true
+  
+  try {
+    // Crear el objeto de datos a guardar
+    const dataToSave = {
+      name: formData.value.name,
+      brand: formData.value.brand,
+      condition: formData.value.condition,
+      price: formData.value.price,
+      storage: formData.value.storage,
+      ram: formData.value.ram,
+      color: formData.value.color,
+      description: formData.value.description,
+      images: formData.value.images, // Array de imágenes en base64
+      location: formData.value.location,
+      city: formData.value.city,
+      phone: formData.value.phone,
+      createdAt: new Date().toISOString(),
+      status: 'active'
+    }
+    
+    const docRef = await addDoc(collection(db, "Celulares"), dataToSave)
+    console.log("Document written with ID: ", docRef.id)
+    
+    setTimeout(() => {
+      loading.value = false
+      
+      $q.notify({
+        message: '¡Anuncio publicado exitosamente!',
+        color: 'positive',
+        icon: 'check_circle',
+        position: 'top',
+        timeout: 3000
+      })
 
-  // Simular llamada a API
-  setTimeout(() => {
+      router.push('/productos')
+    }, 2000)
+    
+  } catch (e) {
+    console.error("Error adding document: ", e)
     loading.value = false
     
     $q.notify({
-      message: '¡Anuncio publicado exitosamente!',
-      color: 'positive',
-      icon: 'check_circle',
-      position: 'top',
-      timeout: 3000
+      message: 'Error al publicar el anuncio. Intenta de nuevo.',
+      color: 'negative',
+      icon: 'error',
+      position: 'top'
     })
-
-    router.push('/productos')
-  }, 2000)
+  }
 }
 </script>
 

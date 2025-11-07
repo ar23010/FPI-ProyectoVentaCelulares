@@ -101,9 +101,9 @@
               @click="goToProductDetail(product.id)"
             >
               <!-- Imagen del producto o placeholder -->
-              <div v-if="product.image" class="product-image-container">
+              <div v-if="product.images && product.images.length > 0" class="product-image-container">
                 <q-img
-                  :src="product.image"
+                  :src="product.images[0]"
                   :ratio="4/3"
                   spinner-color="primary"
                 >
@@ -116,7 +116,7 @@
               </div>
               
               <!-- Placeholder cuando no hay imagen -->
-              <div v-else class="product-no-image">
+              <div v-else class="product-no-image" >
                 <div class="no-image-content">
                   <q-icon name="phone_android" size="4rem" color="grey-6" />
                   <div class="text-caption text-grey-5 q-mt-sm">Sin imagen</div>
@@ -171,8 +171,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useCollection } from 'vuefire'
+import { collection } from 'firebase/firestore'
+import { db } from 'boot/firebase'
+
 
 const router = useRouter()
 
@@ -207,84 +211,13 @@ const conditions = [
   { label: 'Usado - Aceptable', value: 'Usado - Aceptable' }
 ]
 
-// Datos de ejemplo (en producción vendrían de una API)
-const allProducts = ref([
-  {
-    id: 1,
-    name: 'iPhone 14 Pro Max',
-    brand: 'Apple',
-    price: 1200,
-    condition: 'Nuevo',
-    image: 'https://placehold.co/600x400/3498db/ffffff?text=iPhone+14+Pro',
-    location: 'San Salvador',
-    description: 'iPhone 14 Pro Max 256GB, color morado'
-  },
-  {
-    id: 2,
-    name: 'Samsung Galaxy S23 Ultra',
-    brand: 'Samsung',
-    price: 1100,
-    condition: 'Nuevo',
-    image: 'https://placehold.co/600x400/2ecc71/ffffff?text=Galaxy+S23',
-    location: 'Santa Ana',
-    description: 'Samsung Galaxy S23 Ultra 512GB'
-  },
-  {
-    id: 3,
-    name: 'Xiaomi 13 Pro',
-    brand: 'Xiaomi',
-    price: 800,
-    condition: 'Como nuevo',
-    image: 'https://placehold.co/600x400/e74c3c/ffffff?text=Xiaomi+13',
-    location: 'San Miguel',
-    description: 'Xiaomi 13 Pro 256GB, usado 2 meses'
-  },
-  {
-    id: 4,
-    name: 'iPhone 13',
-    brand: 'Apple',
-    price: 850,
-    condition: 'Usado - Buen estado',
-    image: 'https://placehold.co/600x400/9b59b6/ffffff?text=iPhone+13',
-    location: 'San Salvador',
-    description: 'iPhone 13 128GB, excelente estado'
-  },
-  {
-    id: 5,
-    name: 'Samsung Galaxy A54',
-    brand: 'Samsung',
-    price: 400,
-    condition: 'Nuevo',
-    image: 'https://placehold.co/600x400/f39c12/ffffff?text=Galaxy+A54',
-    location: 'La Libertad',
-    description: 'Samsung Galaxy A54 5G 128GB'
-  },
-  {
-    id: 6,
-    name: 'Motorola Edge 40',
-    brand: 'Motorola',
-    price: 500,
-    condition: 'Nuevo',
-    image: 'https://placehold.co/600x400/1abc9c/ffffff?text=Moto+Edge',
-    location: 'Sonsonate',
-    description: 'Motorola Edge 40 256GB'
-  },
-  {
-    id: 7,
-    name: 'OnePlus 11 Pro',
-    brand: 'OnePlus',
-    price: 650,
-    condition: 'Como nuevo',
-    image: null, // Producto de prueba sin imagen
-    location: 'San Salvador',
-    description: 'OnePlus 11 Pro 256GB - Producto de prueba para integración Firebase'
-  }
-])
+// Datos de productos
+const allProducts = useCollection(collection(db, "Celulares"))
 
-const filteredProducts = ref([...allProducts.value])
-
-// Funciones de filtrado
-const filterProducts = () => {
+// Se uso computed para manejar filtros y ordenamiento de manera reactiva
+const filteredProducts = computed(() => {
+  if (!allProducts.value) return []
+  
   let filtered = [...allProducts.value]
 
   // Filtrar por búsqueda
@@ -317,47 +250,37 @@ const filterProducts = () => {
     p => p.price >= priceRange.value.min && p.price <= priceRange.value.max
   )
 
-  filteredProducts.value = filtered
-  sortProducts()
-}
-
-const sortProducts = () => {
-  const sorted = [...filteredProducts.value]
-
+  // Aplicar ordenamiento
   switch (sortOption.value) {
     case 'Menor precio':
-      sorted.sort((a, b) => a.price - b.price)
+      filtered.sort((a, b) => a.price - b.price)
       break
     case 'Mayor precio':
-      sorted.sort((a, b) => b.price - a.price)
-      break
-    case 'Más populares':
-      // Aquí podrías ordenar por número de vistas o likes
+      filtered.sort((a, b) => b.price - a.price)
       break
     case 'Más recientes':
     default:
-      sorted.sort((a, b) => b.id - a.id)
+      filtered.sort((a, b) => b.id - a.id)
       break
   }
 
-  filteredProducts.value = sorted
-}
+  return filtered
+})
+
+const filterProducts = () => {}
+
+const sortProducts = () => {}
 
 const clearFilters = () => {
   searchQuery.value = ''
   selectedBrands.value = []
   selectedConditions.value = []
   priceRange.value = { min: 0, max: 2000 }
-  filterProducts()
 }
 
 const goToProductDetail = (id) => {
   router.push(`/producto/${id}`)
 }
-
-onMounted(() => {
-  filterProducts()
-})
 </script>
 
 <style scoped lang="scss">

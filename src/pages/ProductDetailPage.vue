@@ -1,6 +1,28 @@
 <template>
   <q-page padding>
-    <div v-if="product" class="row q-col-gutter-lg">
+    <!-- Indicador de carga -->
+    <div v-if="product === undefined" class="text-center q-pa-xl">
+      <q-spinner-dots size="50px" color="primary" />
+      <div class="text-h6 text-white q-mt-md">Cargando producto...</div>
+    </div>
+
+    <!-- Producto no encontrado -->
+    <div v-else-if="product === null" class="text-center q-pa-xl">
+      <q-icon name="error_outline" size="4rem" color="grey-5" />
+      <div class="text-h6 text-white q-mt-md">Producto no encontrado</div>
+      <div class="text-body2 text-grey-5 q-mb-md">
+        El producto que buscas no existe o ha sido eliminado
+      </div>
+      <q-btn
+        unelevated
+        color="primary"
+        label="Volver a productos"
+        @click="router.push('/productos')"
+      />
+    </div>
+
+    <!-- Contenido del producto -->
+    <div v-else class="row q-col-gutter-lg">
       <!-- Galería de imágenes o placeholder -->
       <div class="col-12 col-md-6">
         <q-card flat bordered class="dark-card">
@@ -20,8 +42,15 @@
               v-for="(img, index) in product.images"
               :key="index"
               :name="index"
-              :img-src="img"
-            />
+            >
+              <q-img
+                :src="img"
+                fit="contain"
+                height="400px"
+                class="full-width"
+                spinner-color="primary"
+              />
+            </q-carousel-slide>
           </q-carousel>
           
           <!-- Placeholder si no hay imágenes -->
@@ -121,13 +150,13 @@
               <div class="text-h6 q-mb-sm text-white">Vendedor</div>
               <div class="row items-center q-gutter-sm">
                 <q-avatar size="50px" color="primary" text-color="white">
-                  {{ product.seller.name.charAt(0) }}
+                  V
                 </q-avatar>
                 <div>
-                  <div class="text-subtitle1 text-white">{{ product.seller.name }}</div>
+                  <div class="text-subtitle1 text-white">Vendedor Anonimo</div>
                   <div class="text-caption text-grey-5">
                     <q-icon name="star" color="orange" size="xs" />
-                    {{ product.seller.rating }} ({{ product.seller.reviews }} reseñas)
+                    4.5 (10 reseñas)
                   </div>
                 </div>
               </div>
@@ -237,9 +266,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { useDocument, useCollection } from 'vuefire'
+import { doc, collection } from 'firebase/firestore'
+import { db } from 'boot/firebase'
 
 const route = useRoute()
 const router = useRouter()
@@ -251,180 +283,30 @@ const showOfferDialog = ref(false)
 const contactMessage = ref('')
 const offerAmount = ref(null)
 
-// Datos del producto (en producción vendría de una API)
-const product = ref(null)
-const similarProducts = ref([])
+// Obtener el ID del producto desde la ruta (ID automático de Firebase)
+const productId = computed(() => route.params.id)
 
-const loadProduct = () => {
-  const productId = parseInt(route.params.id)
-  
-  // Datos de ejemplo - deben coincidir con ProductListPage.vue
-  const mockProducts = [
-    {
-      id: 1,
-      name: 'iPhone 14 Pro Max',
-      brand: 'Apple',
-      price: 1200,
-      condition: 'Nuevo',
-      storage: '256GB',
-      ram: '6GB',
-      color: 'Morado oscuro',
-      location: 'San Salvador',
-      description: 'iPhone 14 Pro Max 256GB completamente nuevo en caja sellada. Incluye cargador y audifonos. Garantía de 1 año. El dispositivo cuenta con Dynamic Island, chip A16 Bionic, sistema de cámara Pro de 48 MP y pantalla Super Retina XDR de 6.7 pulgadas.',
-      images: [
-        'https://placehold.co/800x600/3498db/ffffff?text=iPhone+14+Pro+1',
-        'https://placehold.co/800x600/3498db/ffffff?text=iPhone+14+Pro+2',
-        'https://placehold.co/800x600/3498db/ffffff?text=iPhone+14+Pro+3'
-      ],
-      seller: {
-        name: 'Juan Pérez',
-        rating: 4.8,
-        reviews: 45
-      }
-    },
-    {
-      id: 2,
-      name: 'Samsung Galaxy S23 Ultra',
-      brand: 'Samsung',
-      price: 1100,
-      condition: 'Nuevo',
-      storage: '512GB',
-      ram: '12GB',
-      color: 'Negro fantasma',
-      location: 'Santa Ana',
-      description: 'Samsung Galaxy S23 Ultra 512GB nuevo. Cámara de 200MP, S Pen incluido, batería de 5000mAh. Pantalla Dynamic AMOLED 2X de 6.8 pulgadas con 120Hz. Procesador Snapdragon 8 Gen 2.',
-      images: [
-        'https://placehold.co/800x600/2ecc71/ffffff?text=Galaxy+S23+1',
-        'https://placehold.co/800x600/2ecc71/ffffff?text=Galaxy+S23+2',
-        'https://placehold.co/800x600/2ecc71/ffffff?text=Galaxy+S23+3'
-      ],
-      seller: {
-        name: 'María González',
-        rating: 4.9,
-        reviews: 67
-      }
-    },
-    {
-      id: 3,
-      name: 'Xiaomi 13 Pro',
-      brand: 'Xiaomi',
-      price: 800,
-      condition: 'Como nuevo',
-      storage: '256GB',
-      ram: '12GB',
-      color: 'Negro',
-      location: 'San Miguel',
-      description: 'Xiaomi 13 Pro 256GB, usado solo 2 meses. Como nuevo, sin rayones ni golpes. Incluye caja original y todos los accesorios. Cámara Leica, procesador Snapdragon 8 Gen 2, pantalla AMOLED de 6.73 pulgadas.',
-      images: [
-        'https://placehold.co/800x600/e74c3c/ffffff?text=Xiaomi+13+1',
-        'https://placehold.co/800x600/e74c3c/ffffff?text=Xiaomi+13+2',
-        'https://placehold.co/800x600/e74c3c/ffffff?text=Xiaomi+13+3'
-      ],
-      seller: {
-        name: 'Carlos Martínez',
-        rating: 4.7,
-        reviews: 32
-      }
-    },
-    {
-      id: 4,
-      name: 'iPhone 13',
-      brand: 'Apple',
-      price: 850,
-      condition: 'Usado - Buen estado',
-      storage: '128GB',
-      ram: '4GB',
-      color: 'Azul',
-      location: 'San Salvador',
-      description: 'iPhone 13 128GB en excelente estado. Batería al 92%. Sin golpes ni rayones. Incluye cargador. Chip A15 Bionic, sistema de cámara dual, pantalla Super Retina XDR de 6.1 pulgadas.',
-      images: [
-        'https://placehold.co/800x600/9b59b6/ffffff?text=iPhone+13+1',
-        'https://placehold.co/800x600/9b59b6/ffffff?text=iPhone+13+2'
-      ],
-      seller: {
-        name: 'Ana López',
-        rating: 4.6,
-        reviews: 28
-      }
-    },
-    {
-      id: 5,
-      name: 'Samsung Galaxy A54',
-      brand: 'Samsung',
-      price: 400,
-      condition: 'Nuevo',
-      storage: '128GB',
-      ram: '8GB',
-      color: 'Violeta',
-      location: 'La Libertad',
-      description: 'Samsung Galaxy A54 5G 128GB completamente nuevo en caja sellada. Cámara de 50MP, batería de 5000mAh, pantalla Super AMOLED de 6.4 pulgadas con 120Hz. Procesador Exynos 1380.',
-      images: [
-        'https://placehold.co/800x600/f39c12/ffffff?text=Galaxy+A54+1',
-        'https://placehold.co/800x600/f39c12/ffffff?text=Galaxy+A54+2'
-      ],
-      seller: {
-        name: 'Roberto Flores',
-        rating: 4.8,
-        reviews: 51
-      }
-    },
-    {
-      id: 6,
-      name: 'Motorola Edge 40',
-      brand: 'Motorola',
-      price: 500,
-      condition: 'Nuevo',
-      storage: '256GB',
-      ram: '8GB',
-      color: 'Eclipse Black',
-      location: 'Sonsonate',
-      description: 'Motorola Edge 40 256GB nuevo en caja. Pantalla pOLED de 6.55 pulgadas con 144Hz, cámara de 50MP con OIS, procesador MediaTek Dimensity 8020, carga rápida de 68W.',
-      images: [
-        'https://placehold.co/800x600/1abc9c/ffffff?text=Moto+Edge+1',
-        'https://placehold.co/800x600/1abc9c/ffffff?text=Moto+Edge+2'
-      ],
-      seller: {
-        name: 'Luis Ramírez',
-        rating: 4.7,
-        reviews: 39
-      }
-    },
-    {
-      id: 7,
-      name: 'OnePlus 11 Pro',
-      brand: 'OnePlus',
-      price: 650,
-      condition: 'Como nuevo',
-      storage: '256GB',
-      ram: '12GB',
-      color: 'Eternal Green',
-      location: 'San Salvador',
-      description: 'OnePlus 11 Pro 256GB en excelente estado, usado por 3 meses. Incluye cargador original de 100W, cable USB-C y caja. Pantalla AMOLED de 6.7 pulgadas con tecnología LTPO 3.0, cámara Hasselblad de 50MP con OIS. Procesador Snapdragon 8 Gen 2, batería de 5000mAh. Producto de prueba para integración con Firebase - imagen pendiente de subir.',
-      images: null, // Producto de prueba sin imagen
-      seller: {
-        name: 'Carlos Méndez',
-        rating: 4.9,
-        reviews: 67
-      }
-    }
-  ]
+// Usar useDocument para obtener el producto específico por su ID de Firebase
+const product = useDocument(() => 
+  productId.value ? doc(db, 'Celulares', productId.value) : null
+)
 
-  product.value = mockProducts.find(p => p.id === productId)
+// Obtener todos los productos para similares
+const allProducts = useCollection(collection(db, "Celulares"))
+
+// Productos similares basados en la marca del producto actual
+const similarProducts = computed(() => {
+  if (!product.value || !allProducts.value) return []
   
-  // Si no se encuentra el producto, mostrar error o redirigir
-  if (!product.value) {
-    $q.notify({
-      message: 'Producto no encontrado',
-      color: 'negative',
-      position: 'top'
-    })
-    router.push('/productos')
-    return
-  }
-  
-  // Cargar productos similares
-  similarProducts.value = mockProducts.filter(p => p.id !== productId).slice(0, 4)
-}
+  return allProducts.value
+    .filter(p => 
+      p.id !== productId.value && 
+      p.brand === product.value.brand
+    )
+    .slice(0, 4)
+})
+
+
 
 const toggleFavorite = () => {
   $q.notify({
@@ -487,13 +369,8 @@ const submitOffer = () => {
 
 const goToProduct = (id) => {
   router.push(`/producto/${id}`)
-  loadProduct()
   window.scrollTo(0, 0)
 }
-
-onMounted(() => {
-  loadProduct()
-})
 </script>
 
 <style scoped lang="scss">
