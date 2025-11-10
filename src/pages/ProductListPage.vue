@@ -1,6 +1,5 @@
 <template>
   <q-page padding>
-    <!-- Barra de búsqueda y filtros -->
     <div class="q-mb-lg">
       <div class="row q-col-gutter-md">
         <div class="col-12 col-md-8">
@@ -27,14 +26,12 @@
       </div>
     </div>
 
-    <!-- Filtros laterales -->
     <div class="row q-col-gutter-md">
       <div class="col-12 col-md-3">
         <q-card flat bordered class="dark-card">
           <q-card-section>
             <div class="text-h6 q-mb-md text-white">Filtros</div>
             
-            <!-- Filtro por marca -->
             <div class="q-mb-md">
               <div class="text-subtitle2 q-mb-sm text-white">Marca</div>
               <q-option-group
@@ -47,7 +44,6 @@
               />
             </div>
 
-            <!-- Filtro por rango de precio -->
             <div class="q-mb-md">
               <div class="text-subtitle2 q-mb-sm text-white">Rango de precio</div>
               <q-range
@@ -64,7 +60,6 @@
               </div>
             </div>
 
-            <!-- Filtro por condición -->
             <div class="q-mb-md">
               <div class="text-subtitle2 q-mb-sm text-white">Condición</div>
               <q-option-group
@@ -88,7 +83,6 @@
         </q-card>
       </div>
 
-      <!-- Listado de productos -->
       <div class="col-12 col-md-9">
         <div class="row q-col-gutter-md">
           <div
@@ -100,7 +94,6 @@
               class="product-card cursor-pointer dark-card"
               @click="goToProductDetail(product.id)"
             >
-              <!-- Imagen del producto o placeholder -->
               <div v-if="product.images && product.images.length > 0" class="product-image-container">
                 <q-img
                   :src="product.images[0]"
@@ -115,7 +108,6 @@
                 </q-img>
               </div>
               
-              <!-- Placeholder cuando no hay imagen -->
               <div v-else class="product-no-image" >
                 <div class="no-image-content">
                   <q-icon name="phone_android" size="4rem" color="grey-6" />
@@ -155,7 +147,6 @@
           </div>
         </div>
 
-        <!-- Mensaje cuando no hay resultados -->
         <div v-if="filteredProducts.length === 0" class="text-center q-pa-xl">
           <q-icon name="search_off" size="4rem" color="grey-5" />
           <div class="text-h6 text-white q-mt-md">
@@ -180,14 +171,12 @@ import { db } from 'boot/firebase'
 
 const router = useRouter()
 
-// Estado de búsqueda y filtros
 const searchQuery = ref('')
 const sortOption = ref('Más recientes')
 const selectedBrands = ref([])
 const selectedConditions = ref([])
 const priceRange = ref({ min: 0, max: 2000 })
 
-// Opciones de filtros
 const sortOptions = [
   'Más recientes',
   'Menor precio',
@@ -211,16 +200,13 @@ const conditions = [
   { label: 'Usado - Aceptable', value: 'Usado - Aceptable' }
 ]
 
-// Datos de productos
 const allProducts = useCollection(collection(db, "Celulares"))
 
-// Se uso computed para manejar filtros y ordenamiento de manera reactiva
 const filteredProducts = computed(() => {
   if (!allProducts.value) return []
   
   let filtered = [...allProducts.value]
 
-  // Filtrar por búsqueda
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(
@@ -231,26 +217,22 @@ const filteredProducts = computed(() => {
     )
   }
 
-  // Filtrar por marca
   if (selectedBrands.value.length > 0) {
     filtered = filtered.filter(p =>
       selectedBrands.value.includes(p.brand)
     )
   }
 
-  // Filtrar por condición
   if (selectedConditions.value.length > 0) {
     filtered = filtered.filter(p =>
       selectedConditions.value.includes(p.condition)
     )
   }
 
-  // Filtrar por precio
   filtered = filtered.filter(
     p => p.price >= priceRange.value.min && p.price <= priceRange.value.max
   )
 
-  // Aplicar ordenamiento
   switch (sortOption.value) {
     case 'Menor precio':
       filtered.sort((a, b) => a.price - b.price)
@@ -304,11 +286,10 @@ const goToProductDetail = (id) => {
   border-color: rgba(59, 130, 246, 0.4) !important;
 }
 
-// Placeholder para productos sin imagen - Modo Oscuro
 .body--dark .product-no-image {
   position: relative;
   height: 0;
-  padding-bottom: 75%; // Ratio 4:3
+  padding-bottom: 75%;
   background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
@@ -324,11 +305,10 @@ const goToProductDetail = (id) => {
   }
 }
 
-// Placeholder para productos sin imagen - Modo Claro
 .body--light .product-no-image {
   position: relative;
   height: 0;
-  padding-bottom: 75%; // Ratio 4:3
+  padding-bottom: 75%;
   background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
   border-bottom: 1px solid rgba(59, 130, 246, 0.2);
   display: flex;

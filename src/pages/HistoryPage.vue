@@ -5,7 +5,7 @@
         <div class="text-h4 text-white q-mb-lg">Historial</div>
 
         <q-card flat bordered class="dark-card">
-          <!-- Tabs -->
+       
           <q-tabs
             v-model="tab"
             dense
@@ -21,11 +21,11 @@
           <q-separator />
 
           <q-tab-panels v-model="tab" animated>
-            <!-- Tab de compras -->
+           
             <q-tab-panel name="purchases">
               <div class="text-h6 text-white q-mb-md">Historial de compras</div>
 
-              <!-- Filtros -->
+          
               <div class="row q-col-gutter-sm q-mb-lg">
                 <div class="col-12 col-sm-4">
                   <q-select
@@ -67,7 +67,7 @@
                 </div>
               </div>
 
-              <!-- Lista de compras -->
+         
               <div class="q-gutter-md">
                 <q-card
                   v-for="purchase in filteredPurchases"
@@ -203,7 +203,7 @@
                 </q-card>
               </div>
 
-              <!-- Sin compras -->
+            
               <div v-if="filteredPurchases.length === 0" class="text-center q-pa-xl">
                 <q-icon name="shopping_bag" size="4rem" color="grey-5" />
                 <div class="text-h6 text-white q-mt-md">No tienes compras</div>
@@ -220,11 +220,11 @@
               </div>
             </q-tab-panel>
 
-            <!-- Tab de ventas -->
+           
             <q-tab-panel name="sales">
               <div class="text-h6 text-white q-mb-md">Historial de ventas</div>
 
-              <!-- Filtros -->
+            
               <div class="row q-col-gutter-sm q-mb-lg">
                 <div class="col-12 col-sm-4">
                   <q-select
@@ -266,7 +266,7 @@
                 </div>
               </div>
 
-              <!-- Resumen de ventas -->
+           
               <div class="row q-col-gutter-md q-mb-lg">
                 <div class="col-12 col-sm-4">
                   <q-card flat bordered class="stat-card">
@@ -294,7 +294,7 @@
                 </div>
               </div>
 
-              <!-- Lista de ventas -->
+        
               <div class="q-gutter-md">
                 <q-card
                   v-for="sale in filteredSales"
@@ -372,7 +372,7 @@
                 </q-card>
               </div>
 
-              <!-- Sin ventas -->
+          
               <div v-if="filteredSales.length === 0" class="text-center q-pa-xl">
                 <q-icon name="sell" size="4rem" color="grey-5" />
                 <div class="text-h6 text-white q-mt-md">No tienes ventas</div>
@@ -393,7 +393,7 @@
       </div>
     </div>
 
-    <!-- Diálogo de reseña -->
+  
     <q-dialog v-model="showReview">
       <q-card class="dark-card" style="min-width: 400px">
         <q-card-section>
@@ -437,7 +437,7 @@ import { useQuasar } from 'quasar'
 const $q = useQuasar()
 const tab = ref('purchases')
 
-// Filtros
+
 const purchaseFilter = ref('all')
 const saleFilter = ref('all')
 const purchaseDateFrom = ref('')
@@ -453,13 +453,13 @@ const statusOptions = [
   { label: 'Cancelado', value: 'cancelled' }
 ]
 
-// Diálogo de reseña
+
 const showReview = ref(false)
 const reviewRating = ref(5)
 const reviewComment = ref('')
 const selectedPurchase = ref(null)
 
-// Mock de compras
+
 const purchases = ref([
   {
     id: 1,
@@ -520,7 +520,7 @@ const purchases = ref([
   }
 ])
 
-// Mock de ventas
+
 const sales = ref([
   {
     id: 1,
@@ -556,7 +556,7 @@ const sales = ref([
   }
 ])
 
-// Computed
+
 const filteredPurchases = computed(() => {
   return purchases.value.filter(p => purchaseFilter.value === 'all' || p.status === purchaseFilter.value)
 })
@@ -569,7 +569,7 @@ const totalSales = computed(() => sales.value.length)
 const totalEarnings = computed(() => sales.value.reduce((sum, s) => sum + s.total, 0))
 const pendingSales = computed(() => sales.value.filter(s => s.status === 'processing').length)
 
-// Funciones
+
 const getStatusColor = (status) => {
   const colors = {
     processing: 'orange',

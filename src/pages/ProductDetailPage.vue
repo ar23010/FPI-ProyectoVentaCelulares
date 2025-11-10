@@ -1,12 +1,12 @@
 <template>
   <q-page padding>
-    <!-- Indicador de carga -->
+  
     <div v-if="product === undefined" class="text-center q-pa-xl">
       <q-spinner-dots size="50px" color="primary" />
       <div class="text-h6 text-white q-mt-md">Cargando producto...</div>
     </div>
 
-    <!-- Producto no encontrado -->
+  
     <div v-else-if="product === null" class="text-center q-pa-xl">
       <q-icon name="error_outline" size="4rem" color="grey-5" />
       <div class="text-h6 text-white q-mt-md">Producto no encontrado</div>
@@ -21,12 +21,12 @@
       />
     </div>
 
-    <!-- Contenido del producto -->
+   
     <div v-else class="row q-col-gutter-lg">
-      <!-- Galería de imágenes o placeholder -->
+  
       <div class="col-12 col-md-6">
         <q-card flat bordered class="dark-card">
-          <!-- Carousel si hay imágenes -->
+         
           <q-carousel
             v-if="product.images && product.images.length > 0"
             v-model="currentSlide"
@@ -53,18 +53,18 @@
             </q-carousel-slide>
           </q-carousel>
           
-          <!-- Placeholder si no hay imágenes -->
+         
           <div v-else class="product-detail-no-image">
             <q-icon name="phone_android" size="8rem" color="grey-6" />
             <div class="text-h6 text-grey-5 q-mt-md">Sin imagen disponible</div>
             <div class="text-caption text-grey-6 q-mt-sm">
-              Integración con Firebase próximamente
+            
             </div>
           </div>
         </q-card>
       </div>
 
-      <!-- Información del producto -->
+  
       <div class="col-12 col-md-6">
         <q-card flat bordered class="dark-card">
           <q-card-section>
@@ -85,7 +85,7 @@
 
             <q-separator class="q-my-md" />
 
-            <!-- Especificaciones -->
+           
             <div class="q-mb-md">
               <div class="text-h6 q-mb-sm text-white">Especificaciones</div>
               <q-list dense dark>
@@ -137,7 +137,7 @@
 
             <q-separator class="q-my-md" />
 
-            <!-- Descripción -->
+         
             <div class="q-mb-md">
               <div class="text-h6 q-mb-sm text-white">Descripción</div>
               <p class="text-body1 text-grey-5">{{ product.description }}</p>
@@ -145,7 +145,7 @@
 
             <q-separator class="q-my-md" />
 
-            <!-- Información del vendedor -->
+          
             <div class="q-mb-md">
               <div class="text-h6 q-mb-sm text-white">Vendedor</div>
               <div class="row items-center q-gutter-sm">
@@ -162,8 +162,18 @@
               </div>
             </div>
 
-            <!-- Botones de acción -->
+           
             <div class="q-mt-lg q-gutter-sm">
+              <q-btn
+                unelevated
+                color="positive"
+                size="lg"
+                :label="cartStore.isInCart(product.id) ? 'Ya en carrito' : 'Agregar al carrito'"
+                :icon="cartStore.isInCart(product.id) ? 'check' : 'shopping_cart'"
+                class="full-width q-mb-sm"
+                :disable="cartStore.isInCart(product.id)"
+                @click="addToCart"
+              />
               <q-btn
                 unelevated
                 color="primary"
@@ -173,22 +183,14 @@
                 class="full-width q-mb-sm"
                 @click="contactSeller"
               />
-              <q-btn
-                outline
-                color="primary"
-                size="lg"
-                label="Hacer una oferta"
-                icon="local_offer"
-                class="full-width"
-                @click="makeOffer"
-              />
+            
             </div>
           </q-card-section>
         </q-card>
       </div>
     </div>
 
-    <!-- Productos similares -->
+   
     <div class="q-mt-xl">
       <div class="text-h5 q-mb-md text-white">Productos similares</div>
       <div class="row q-col-gutter-md">
@@ -211,7 +213,7 @@
       </div>
     </div>
 
-    <!-- Diálogos -->
+
     <q-dialog v-model="showContactDialog">
       <q-card style="min-width: 350px">
         <q-card-section>
@@ -236,65 +238,39 @@
       </q-card>
     </q-dialog>
 
-    <q-dialog v-model="showOfferDialog">
-      <q-card style="min-width: 350px">
-        <q-card-section>
-          <div class="text-h6">Hacer una oferta</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          <div class="text-body1 q-mb-md">
-            Precio actual: <strong>${{ product?.price.toLocaleString() }}</strong>
-          </div>
-          <q-input
-            v-model.number="offerAmount"
-            type="number"
-            filled
-            prefix="$"
-            label="Tu oferta"
-            hint="Ingresa el monto que deseas ofrecer"
-          />
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="Cancelar" color="grey" v-close-popup />
-          <q-btn unelevated label="Enviar oferta" color="primary" @click="submitOffer" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    
   </q-page>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useQuasar } from 'quasar'
 import { useDocument, useCollection } from 'vuefire'
 import { doc, collection } from 'firebase/firestore'
 import { db } from 'boot/firebase'
+import { useCartStore } from 'src/stores/carrito'
 
 const route = useRoute()
 const router = useRouter()
-const $q = useQuasar()
+const cartStore = useCartStore()
 
 const currentSlide = ref(0)
 const showContactDialog = ref(false)
-const showOfferDialog = ref(false)
 const contactMessage = ref('')
-const offerAmount = ref(null)
 
-// Obtener el ID del producto desde la ruta (ID automático de Firebase)
+
+
 const productId = computed(() => route.params.id)
 
-// Usar useDocument para obtener el producto específico por su ID de Firebase
+
 const product = useDocument(() => 
   productId.value ? doc(db, 'Celulares', productId.value) : null
 )
 
-// Obtener todos los productos para similares
+
 const allProducts = useCollection(collection(db, "Celulares"))
 
-// Productos similares basados en la marca del producto actual
+
 const similarProducts = computed(() => {
   if (!product.value || !allProducts.value) return []
   
@@ -308,64 +284,35 @@ const similarProducts = computed(() => {
 
 
 
+const addToCart = () => {
+  if (product.value && !cartStore.isInCart(product.value.id)) {
+    cartStore.addToCart(product.value)
+    console.log('Producto agregado al carrito:', product.value.name)
+  }
+}
+
 const toggleFavorite = () => {
-  $q.notify({
-    message: 'Agregado a favoritos',
-    color: 'positive',
-    icon: 'favorite',
-    position: 'top'
-  })
+  console.log('Producto agregado/quitado de favoritos')
 }
 
 const contactSeller = () => {
   showContactDialog.value = true
 }
 
-const makeOffer = () => {
-  showOfferDialog.value = true
-  offerAmount.value = Math.floor(product.value.price * 0.9)
-}
 
 const sendMessage = () => {
   if (!contactMessage.value) {
-    $q.notify({
-      message: 'Por favor escribe un mensaje',
-      color: 'negative',
-      position: 'top'
-    })
+    
     return
   }
 
-  $q.notify({
-    message: 'Mensaje enviado al vendedor',
-    color: 'positive',
-    icon: 'check',
-    position: 'top'
-  })
+ 
   
   showContactDialog.value = false
   contactMessage.value = ''
 }
 
-const submitOffer = () => {
-  if (!offerAmount.value || offerAmount.value <= 0) {
-    $q.notify({
-      message: 'Ingresa un monto válido',
-      color: 'negative',
-      position: 'top'
-    })
-    return
-  }
 
-  $q.notify({
-    message: `Oferta de $${offerAmount.value} enviada al vendedor`,
-    color: 'positive',
-    icon: 'check',
-    position: 'top'
-  })
-  
-  showOfferDialog.value = false
-}
 
 const goToProduct = (id) => {
   router.push(`/producto/${id}`)
@@ -387,7 +334,7 @@ const goToProduct = (id) => {
   }
 }
 
-// Placeholder para detalle sin imagen - Modo Oscuro
+
 .body--dark .product-detail-no-image {
   height: 400px;
   display: flex;
@@ -398,7 +345,7 @@ const goToProduct = (id) => {
   border-radius: 20px;
 }
 
-// Placeholder para detalle sin imagen - Modo Claro
+
 .body--light .product-detail-no-image {
   height: 400px;
   display: flex;

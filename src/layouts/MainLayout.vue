@@ -7,7 +7,7 @@
           CellPhone Market
         </q-toolbar-title>
 
-        <!-- Barra de búsqueda en desktop -->
+ 
         <q-input
           dense
           standout
@@ -23,7 +23,7 @@
 
         <q-space />
 
-        <!-- Botones de navegación -->
+      
         <q-btn
           flat
           dense
@@ -62,8 +62,14 @@
           class="q-mr-sm"
           @click="$router.push('/carrito')"
         >
-          <q-badge color="primary" floating>2</q-badge>
-          <q-tooltip>Carrito</q-tooltip>
+          <q-badge 
+            v-if="cartStore.cartItemsCount > 0" 
+            color="primary" 
+            floating
+          >
+            {{ cartStore.cartItemsCount }}
+          </q-badge>
+          <q-tooltip>Carrito ({{ cartStore.cartItemsCount }} artículos)</q-tooltip>
         </q-btn>
 
         <q-btn
@@ -109,7 +115,7 @@
           </q-menu>
         </q-btn>
 
-        <!-- Menú móvil -->
+        
         <q-btn
           flat
           dense
@@ -120,7 +126,7 @@
         />
       </q-toolbar>
 
-      <!-- Barra de búsqueda en móvil -->
+    
       <q-toolbar class="lt-md">
         <q-input
           dense
@@ -136,7 +142,7 @@
       </q-toolbar>
     </q-header>
 
-    <!-- Drawer para móvil -->
+  
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
@@ -160,6 +166,21 @@
             <q-icon name="add_circle" />
           </q-item-section>
           <q-item-section>Vender</q-item-section>
+        </q-item>
+
+        <q-item clickable @click="$router.push('/carrito')" v-close-popup>
+          <q-item-section avatar>
+            <q-icon name="shopping_cart" />
+          </q-item-section>
+          <q-item-section>Carrito</q-item-section>
+          <q-item-section side>
+            <q-badge 
+              v-if="cartStore.cartItemsCount > 0" 
+              color="primary"
+            >
+              {{ cartStore.cartItemsCount }}
+            </q-badge>
+          </q-item-section>
         </q-item>
 
         <q-item clickable v-close-popup>
@@ -218,7 +239,7 @@
     <q-page-container>
       <router-view />
       
-      <!-- Footer movido dentro del page-container para que aparezca al final -->
+    
       <footer class="footer-section">
         <div class="footer-content">
           <div class="row justify-center q-gutter-md q-py-lg">
@@ -251,7 +272,7 @@
       </footer>
     </q-page-container>
 
-    <!-- Diálogo de Configuración -->
+   
     <q-dialog v-model="showSettingsDialog">
       <q-card style="min-width: 400px" class="settings-card">
         <q-card-section>
@@ -301,8 +322,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
+import { useCartStore } from 'src/stores/carrito'
 
 const $q = useQuasar()
+const cartStore = useCartStore()
 const leftDrawerOpen = ref(false)
 const searchText = ref('')
 const showSettingsDialog = ref(false)
@@ -334,10 +357,10 @@ function toggleLeftDrawer() {
 }
 
 function changeTheme(mode) {
-  // Guardar preferencia
+  
   localStorage.setItem('theme-mode', mode)
   
-  // Aplicar tema
+ 
   if (mode === 'auto') {
     $q.dark.set('auto')
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -363,14 +386,14 @@ function changeTheme(mode) {
 }
 
 onMounted(() => {
-  // Cargar preferencia guardada
+ 
   const savedTheme = localStorage.getItem('theme-mode') || 'auto'
   themeMode.value = savedTheme
 })
 </script>
 
 <style scoped lang="scss">
-// Footer - Modo Oscuro: Negro con highlights blancos
+
 .body--dark .footer-section {
   margin-top: 4rem;
   padding: 0;
@@ -411,7 +434,7 @@ onMounted(() => {
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
-// Footer - Modo Claro: Blanco con highlights azules
+
 .body--light .footer-section {
   margin-top: 4rem;
   padding: 0;

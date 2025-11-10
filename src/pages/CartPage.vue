@@ -5,7 +5,7 @@
         <div class="text-h4 text-white q-mb-lg">Carrito de compras</div>
 
         <div class="row q-col-gutter-lg">
-          <!-- Lista de productos en el carrito -->
+       
           <div class="col-12 col-md-8">
             <q-card flat bordered class="dark-card">
               <q-card-section>
@@ -20,18 +20,21 @@
                     icon="delete_sweep"
                     @click="clearCart"
                     :disable="cartItems.length === 0"
+                    :loading="isClearing"
+                    no-caps
                   />
                 </div>
               </q-card-section>
 
               <q-separator />
 
-              <!-- Items del carrito -->
+            
               <q-list separator>
                 <q-item v-for="item in cartItems" :key="item.id">
                   <q-item-section avatar>
                     <q-avatar size="80px" rounded>
-                      <img :src="item.image" />
+                      <img v-if="item.image" :src="item.image" />
+                      <q-icon v-else name="phone_android" size="2rem" color="grey-6" />
                     </q-avatar>
                   </q-item-section>
 
@@ -40,26 +43,10 @@
                     <q-item-label caption class="text-grey-5">
                       {{ item.brand }} • {{ item.condition }}
                     </q-item-label>
-                    <div class="row items-center q-mt-sm q-gutter-sm">
-                      <q-chip
-                        dense
-                        icon="memory"
-                        color="primary"
-                        text-color="white"
-                        size="sm"
-                      >
-                        {{ item.storage }}
-                      </q-chip>
-                      <q-chip
-                        dense
-                        icon="palette"
-                        color="primary"
-                        text-color="white"
-                        size="sm"
-                      >
-                        {{ item.color }}
-                      </q-chip>
-                    </div>
+                    <q-item-label caption class="text-grey-6 q-mt-xs">
+                      <q-icon name="location_on" size="xs" />
+                      {{ item.location }}
+                    </q-item-label>
                   </q-item-section>
 
                   <q-item-section side class="text-center">
@@ -95,12 +82,14 @@
                       size="sm"
                       class="q-mt-sm"
                       @click="removeItem(item.id)"
+                      :loading="false"
+                      no-caps
                     />
                   </q-item-section>
                 </q-item>
               </q-list>
 
-              <!-- Carrito vacío -->
+            
               <div v-if="cartItems.length === 0" class="text-center q-pa-xl">
                 <q-icon name="shopping_cart" size="5rem" color="grey-5" />
                 <div class="text-h6 text-white q-mt-md">
@@ -119,7 +108,7 @@
               </div>
             </q-card>
 
-            <!-- Cupones y descuentos -->
+      
             <q-card flat bordered class="dark-card q-mt-lg" v-if="cartItems.length > 0">
               <q-card-section>
                 <div class="text-subtitle1 text-white q-mb-md">
@@ -160,7 +149,7 @@
             </q-card>
           </div>
 
-          <!-- Resumen de compra -->
+
           <div class="col-12 col-md-4" v-if="cartItems.length > 0">
             <q-card flat bordered class="dark-card sticky-summary">
               <q-card-section>
@@ -246,7 +235,7 @@
       </div>
     </div>
 
-    <!-- Diálogo de confirmación de compra -->
+    
     <q-dialog v-model="showCheckoutDialog">
       <q-card class="dark-card" style="min-width: 400px">
         <q-card-section class="text-center">
@@ -286,60 +275,23 @@
 import { ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
+import { useCartStore } from 'src/stores/carrito'
 
 const $q = useQuasar()
 const router = useRouter()
-
-// Mock de items en el carrito
-const cartItems = ref([
-  {
-    id: 1,
-    name: 'iPhone 13',
-    brand: 'Apple',
-    price: 750,
-    quantity: 1,
-    image: 'https://placehold.co/400x400/3498db/ffffff?text=iPhone+13',
-    storage: '128GB',
-    color: 'Azul medianoche',
-    condition: 'Nuevo'
-  },
-  {
-    id: 2,
-    name: 'Samsung Galaxy S22',
-    brand: 'Samsung',
-    price: 600,
-    quantity: 1,
-    image: 'https://placehold.co/400x400/2ecc71/ffffff?text=Galaxy+S22',
-    storage: '256GB',
-    color: 'Negro',
-    condition: 'Como nuevo'
-  },
-  {
-    id: 3,
-    name: 'Xiaomi 13 Pro',
-    brand: 'Xiaomi',
-    price: 800,
-    quantity: 1,
-    image: 'https://placehold.co/400x400/e74c3c/ffffff?text=Xiaomi+13',
-    storage: '256GB',
-    color: 'Blanco',
-    condition: 'Nuevo'
-  }
-])
+const cartStore = useCartStore()
 
 const couponCode = ref('')
 const appliedCoupon = ref(null)
 const showCheckoutDialog = ref(false)
 const orderNumber = ref('')
+const isClearing = ref(false)
 
-// Computed properties
-const totalItems = computed(() => {
-  return cartItems.value.reduce((sum, item) => sum + item.quantity, 0)
-})
 
-const subtotal = computed(() => {
-  return cartItems.value.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-})
+const cartItems = computed(() => cartStore.cartItems)
+const totalItems = computed(() => cartStore.cartItemsCount)
+
+const subtotal = computed(() => cartStore.cartTotal)
 
 const shipping = computed(() => {
   return subtotal.value >= 500 ? 0 : 25
@@ -353,75 +305,58 @@ const total = computed(() => {
   return Math.max(0, t)
 })
 
-// Funciones
+
 const increaseQuantity = (id) => {
-  const item = cartItems.value.find(i => i.id === id)
-  if (item) {
-    item.quantity++
-  }
+  const currentQuantity = cartStore.getItemQuantity(id)
+  cartStore.updateQuantity(id, currentQuantity + 1)
 }
 
 const decreaseQuantity = (id) => {
-  const item = cartItems.value.find(i => i.id === id)
-  if (item && item.quantity > 1) {
-    item.quantity--
+  const currentQuantity = cartStore.getItemQuantity(id)
+  if (currentQuantity > 1) {
+    cartStore.updateQuantity(id, currentQuantity - 1)
   }
 }
 
 const removeItem = (id) => {
-  $q.dialog({
-    title: 'Eliminar producto',
-    message: '¿Estás seguro de eliminar este producto del carrito?',
-    cancel: {
-      label: 'Cancelar',
-      flat: true
-    },
-    persistent: true,
-    ok: {
-      label: 'Eliminar',
-      color: 'negative'
-    }
-  }).onOk(() => {
-    const index = cartItems.value.findIndex(i => i.id === id)
-    if (index !== -1) {
-      cartItems.value.splice(index, 1)
-      $q.notify({
-        message: 'Producto eliminado del carrito',
-        color: 'info',
-        icon: 'delete',
-        position: 'top'
-      })
-    }
-  })
+
+  if (!cartStore.isInCart(id)) {
+    console.log('El producto ya no está en el carrito')
+    return
+  }
+
+  try {
+    cartStore.removeFromCart(id)
+    console.log('Producto eliminado del carrito:', id)
+  } catch (error) {
+    console.error('Error al eliminar producto:', error)
+  }
 }
 
 const clearCart = () => {
-  $q.dialog({
-    title: 'Vaciar carrito',
-    message: '¿Estás seguro de eliminar todos los productos del carrito?',
-    cancel: {
-      label: 'Cancelar',
-      flat: true
-    },
-    persistent: true,
-    ok: {
-      label: 'Vaciar',
-      color: 'negative'
-    }
-  }).onOk(() => {
-    cartItems.value = []
-    appliedCoupon.value = null
-    $q.notify({
-      message: 'Carrito vaciado',
-      color: 'info',
-      icon: 'shopping_cart',
-      position: 'top'
-    })
-  })
+  
+  if (cartItems.value.length === 0) {
+    console.log('El carrito ya está vacío')
+    return
+  }
+
+  isClearing.value = true
+  try {
+    setTimeout(() => {
+      cartStore.clearCart()
+      appliedCoupon.value = null
+      couponCode.value = ''
+      isClearing.value = false
+      console.log('Carrito vaciado exitosamente')
+    }, 500) 
+  } catch (error) {
+    console.error('Error al vaciar carrito:', error)
+    isClearing.value = false
+  }
 }
 
 const applyCoupon = () => {
-  // Mock de validación de cupón
+
   const validCoupons = {
     'PROMO10': { code: 'PROMO10', discount: 10 },
     'SAVE20': { code: 'SAVE20', discount: 20 },
@@ -455,9 +390,9 @@ const checkout = () => {
   orderNumber.value = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase()
   showCheckoutDialog.value = true
   
-  // Limpiar carrito después de la compra
+ 
   setTimeout(() => {
-    cartItems.value = []
+    cartStore.clearCart()
     appliedCoupon.value = null
     couponCode.value = ''
   }, 500)

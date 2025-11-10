@@ -19,7 +19,6 @@
               color="primary"
               animated
             >
-              <!-- Paso 1: Información básica -->
               <q-step
                 :name="1"
                 title="Información básica"
@@ -74,7 +73,6 @@
                 </q-form>
               </q-step>
 
-              <!-- Paso 2: Especificaciones técnicas -->
               <q-step
                 :name="2"
                 title="Especificaciones"
@@ -135,7 +133,6 @@
                 </q-form>
               </q-step>
 
-              <!-- Paso 3: Imágenes -->
               <q-step
                 :name="3"
                 title="Imágenes"
@@ -211,7 +208,6 @@
                 </div>
               </q-step>
 
-              <!-- Paso 4: Ubicación -->
               <q-step
                 :name="4"
                 title="Ubicación"
@@ -309,7 +305,6 @@ const formData = ref({
 const selectedFiles = ref([]) 
 const convertingImages = ref(false)
 
-// Opciones
 const brands = [
   'Apple',
   'Samsung',
@@ -375,8 +370,6 @@ const nextStep = () => {
   step.value++
 }
 
-
-// Manejar la selección de archivos y convertir a base64
 const handleImageSelection = async () => {
   if (selectedFiles.value) {
     convertingImages.value = true
@@ -386,11 +379,10 @@ const handleImageSelection = async () => {
       ? selectedFiles.value
       : [selectedFiles.value]
     
-    // Procesar archivos de forma secuencial
     for (const file of files) {
       try {
         const base64 = await convertFileToBase64(file)
-        formData.value.images.push(base64) // Guardar directamente en formData.images
+        formData.value.images.push(base64)
       } catch (error) {
         console.error('Error converting image to base64:', error)
         $q.notify({
@@ -405,7 +397,6 @@ const handleImageSelection = async () => {
   }
 }
 
-// Función auxiliar para convertir archivo a base64
 const convertFileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -418,14 +409,12 @@ const convertFileToBase64 = (file) => {
       reject(error)
     }
     
-    // Redimensionar imagen si es muy grande
-    if (file.size > 1024 * 1024) { // Si es mayor a 1MB
+    if (file.size > 1024 * 1024) {
       compressImage(file)
         .then(compressedFile => {
           reader.readAsDataURL(compressedFile)
         })
         .catch(() => {
-          // Si falla la compresión, usar archivo original
           reader.readAsDataURL(file)
         })
     } else {
@@ -434,7 +423,6 @@ const convertFileToBase64 = (file) => {
   })
 }
 
-// Función para comprimir imágenes
 const compressImage = (file, maxWidth = 800, quality = 0.8) => {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas')
@@ -460,7 +448,6 @@ const compressImage = (file, maxWidth = 800, quality = 0.8) => {
 const removeImage = (index) => {
   formData.value.images.splice(index, 1)
   
-  // También remover del array de archivos seleccionados
   if (Array.isArray(selectedFiles.value)) {
     selectedFiles.value.splice(index, 1)
   }
@@ -470,7 +457,6 @@ const submitForm = async () => {
   loading.value = true
   
   try {
-    // Crear el objeto de datos a guardar
     const dataToSave = {
       name: formData.value.name,
       brand: formData.value.brand,
@@ -480,7 +466,7 @@ const submitForm = async () => {
       ram: formData.value.ram,
       color: formData.value.color,
       description: formData.value.description,
-      images: formData.value.images, // Array de imágenes en base64
+      images: formData.value.images,
       location: formData.value.location,
       city: formData.value.city,
       phone: formData.value.phone,

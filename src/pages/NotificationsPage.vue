@@ -22,7 +22,7 @@
 
           <q-separator />
 
-          <!-- Tabs para filtrar notificaciones -->
+        
           <q-tabs
             v-model="tab"
             dense
@@ -39,7 +39,7 @@
 
           <q-separator />
 
-          <!-- Lista de notificaciones -->
+        
           <q-list separator>
             <q-item
               v-for="notification in filteredNotifications"
@@ -93,7 +93,7 @@
             </q-item>
           </q-list>
 
-          <!-- Mensaje cuando no hay notificaciones -->
+         
           <div v-if="filteredNotifications.length === 0" class="text-center q-pa-xl">
             <q-icon name="notifications_off" size="4rem" color="grey-5" />
             <div class="text-h6 text-white q-mt-md">
@@ -116,7 +116,7 @@ import { useQuasar } from 'quasar'
 const $q = useQuasar()
 const tab = ref('all')
 
-// Mock de notificaciones
+
 const notifications = ref([
   {
     id: 1,
@@ -192,7 +192,7 @@ const notifications = ref([
   }
 ])
 
-// Computed
+
 const unreadCount = computed(() => {
   return notifications.value.filter(n => !n.read).length
 })
@@ -204,7 +204,7 @@ const filteredNotifications = computed(() => {
   return notifications.value.filter(n => n.category === tab.value)
 })
 
-// Funciones
+
 const getIcon = (type) => {
   const icons = {
     favorite: 'favorite',

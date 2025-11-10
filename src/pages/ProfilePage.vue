@@ -1,7 +1,6 @@
 <template>
   <q-page padding>
     <div class="row q-col-gutter-lg">
-      <!-- Información del perfil -->
       <div class="col-12 col-md-4">
         <q-card flat bordered class="dark-card">
           <q-card-section class="text-center">
@@ -92,7 +91,6 @@
         </q-card>
       </div>
 
-      <!-- Tabs de contenido -->
       <div class="col-12 col-md-8">
         <q-card flat bordered class="dark-card">
           <q-tabs
@@ -111,7 +109,6 @@
           <q-separator />
 
           <q-tab-panels v-model="tab" animated>
-            <!-- Mis productos -->
             <q-tab-panel name="products">
               <div class="text-h6 text-white q-mb-md">Productos publicados</div>
               
@@ -163,7 +160,6 @@
               </div>
             </q-tab-panel>
 
-            <!-- Favoritos -->
             <q-tab-panel name="favorites">
               <div class="text-h6 text-white q-mb-md">Productos favoritos</div>
               
@@ -203,7 +199,6 @@
               </div>
             </q-tab-panel>
 
-            <!-- Reseñas -->
             <q-tab-panel name="reviews">
               <div class="text-h6 text-white q-mb-md">Reseñas recibidas</div>
               
@@ -257,7 +252,6 @@
       </div>
     </div>
 
-    <!-- Diálogo de edición de perfil -->
     <q-dialog v-model="showEditDialog">
       <q-card class="dark-card" style="min-width: 400px">
         <q-card-section>
@@ -302,7 +296,6 @@ const $q = useQuasar()
 const tab = ref('products')
 const showEditDialog = ref(false)
 
-// Mock de datos del usuario
 const user = ref({
   name: 'Juan Pérez',
   initials: 'JP',
@@ -322,7 +315,6 @@ const user = ref({
 
 const editUser = ref({ ...user.value })
 
-// Mock de productos del usuario
 const myProducts = ref([
   {
     id: 1,
@@ -342,7 +334,6 @@ const myProducts = ref([
   }
 ])
 
-// Mock de favoritos
 const favorites = ref([
   {
     id: 1,
@@ -367,7 +358,6 @@ const favorites = ref([
   }
 ])
 
-// Mock de reseñas
 const reviews = ref([
   {
     id: 1,
@@ -392,7 +382,6 @@ const reviews = ref([
   }
 ])
 
-// Funciones
 const removeFavorite = (id) => {
   const index = favorites.value.findIndex(f => f.id === id)
   if (index !== -1) {
