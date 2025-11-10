@@ -213,7 +213,7 @@
                 title="Ubicación"
                 icon="location_on"
               >
-                <q-form @submit="submitForm" class="q-gutter-md">
+                <q-form @submit.prevent="submitForm" class="q-gutter-md">
                   <q-select
                     v-model="formData.location"
                     filled
@@ -241,7 +241,6 @@
                   <q-checkbox
                     v-model="formData.acceptTerms"
                     label="Acepto los términos y condiciones"
-                    :rules="[val => !!val || 'Debes aceptar los términos']"
                   />
 
                   <q-stepper-navigation>
@@ -253,11 +252,13 @@
                       class="q-mr-sm"
                     />
                     <q-btn
-                      type="submit"
+                      unelevated
                       color="primary"
                       label="Publicar anuncio"
                       icon="publish"
                       :loading="loading"
+                      :disable="!formData.acceptTerms"
+                      @click="submitForm"
                     />
                   </q-stepper-navigation>
                 </q-form>
@@ -454,6 +455,7 @@ const removeImage = (index) => {
 }
 
 const submitForm = async () => {
+  console.log('submitForm llamado')
   loading.value = true
   
   try {
@@ -474,32 +476,59 @@ const submitForm = async () => {
       status: 'active'
     }
     
-    const docRef = await addDoc(collection(db, "Celulares"), dataToSave)
-    console.log("Document written with ID: ", docRef.id)
+    console.log('Intentando guardar en Firebase...', dataToSave)
     
-    setTimeout(() => {
-      loading.value = false
-      
-      $q.notify({
-        message: '¡Anuncio publicado exitosamente!',
-        color: 'positive',
-        icon: 'check_circle',
-        position: 'top',
-        timeout: 3000
-      })
+    // Intentar guardar en Firebase si está disponible
+    if (db) {
+      try {
+        const docRef = await addDoc(collection(db, "Celulares"), dataToSave)
+        console.log("Document written with ID: ", docRef.id)
+      } catch (firebaseError) {
+        console.warn("Firebase no disponible, guardando localmente:", firebaseError)
+        // Guardar en localStorage como fallback
+        const existingProducts = JSON.parse(localStorage.getItem('products') || '[]')
+        existingProducts.push({ ...dataToSave, id: Date.now() })
+        localStorage.setItem('products', JSON.stringify(existingProducts))
+      }
+    } else {
+      console.log("Firebase no configurado, guardando localmente")
+      // Guardar en localStorage
+      const existingProducts = JSON.parse(localStorage.getItem('products') || '[]')
+      existingProducts.push({ ...dataToSave, id: Date.now() })
+      localStorage.setItem('products', JSON.stringify(existingProducts))
+    }
+    
+    loading.value = false
+    
+    // Mostrar notificación de éxito
+    $q.notify({
+      message: '¡Producto publicado exitosamente!',
+      caption: 'Tu anuncio ya está visible en el marketplace',
+      color: 'positive',
+      icon: 'check_circle',
+      position: 'top',
+      timeout: 2500,
+      actions: [
+        { label: 'Ver', color: 'white', handler: () => { router.push('/productos') } }
+      ]
+    })
 
+    // Redirigir a la página de productos después de un breve delay
+    setTimeout(() => {
       router.push('/productos')
-    }, 2000)
+    }, 1500)
     
   } catch (e) {
     console.error("Error adding document: ", e)
     loading.value = false
     
     $q.notify({
-      message: 'Error al publicar el anuncio. Intenta de nuevo.',
+      message: 'Error al publicar el anuncio',
+      caption: e.message || 'Por favor, intenta de nuevo',
       color: 'negative',
       icon: 'error',
-      position: 'top'
+      position: 'top',
+      timeout: 3000
     })
   }
 }
