@@ -26,9 +26,7 @@
   
       <div class="col-12 col-md-6">
         <q-card flat bordered class="dark-card">
-         
           <q-carousel
-            v-if="product.images && product.images.length > 0"
             v-model="currentSlide"
             animated
             navigation
@@ -52,15 +50,6 @@
               />
             </q-carousel-slide>
           </q-carousel>
-          
-         
-          <div v-else class="product-detail-no-image">
-            <q-icon name="phone_android" size="8rem" color="grey-6" />
-            <div class="text-h6 text-grey-5 q-mt-md">Sin imagen disponible</div>
-            <div class="text-caption text-grey-6 q-mt-sm">
-            
-            </div>
-          </div>
         </q-card>
       </div>
 
@@ -254,6 +243,31 @@ const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
 
+// Función para generar imagen placeholder basada en el nombre del producto
+const getPlaceholderImage = (productName, brand) => {
+  const words = productName.split(' ').filter(w => w.length > 0)
+  const initials = words.slice(0, 2).map(w => w[0]).join('').toUpperCase()
+  
+  const brandColors = {
+    'Apple': '000000',
+    'Samsung': '1428A0',
+    'Xiaomi': 'FF6900',
+    'Huawei': 'FF0000',
+    'Motorola': '5B5EA6',
+    'OnePlus': 'F50514',
+    'Google': '4285F4',
+    'Sony': '000000',
+    'LG': 'A50034',
+    'Nokia': '124191',
+    'Realme': 'F5D000',
+    'OPPO': '0EAF8B'
+  }
+  
+  const color = brandColors[brand] || '3B82F6'
+  
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&size=800&background=${color}&color=fff&bold=true&font-size=0.4`
+}
+
 const currentSlide = ref(0)
 const showContactDialog = ref(false)
 const contactMessage = ref('')
@@ -262,15 +276,30 @@ const contactMessage = ref('')
 
 const productId = computed(() => route.params.id)
 
-
-const product = useDocument(() => 
+// Cargar el producto desde Firebase
+const productDoc = useDocument(() => 
   productId.value ? doc(db, 'Celulares', productId.value) : null
 )
 
+// Producto con imagen placeholder si no tiene imágenes
+const product = computed(() => {
+  if (!productDoc.value) return productDoc.value
+  
+  if (!productDoc.value.images || productDoc.value.images.length === 0) {
+    return {
+      ...productDoc.value,
+      images: [getPlaceholderImage(productDoc.value.name, productDoc.value.brand)]
+    }
+  }
+  
+  return productDoc.value
+})
 
+// Cargar todos los productos para las recomendaciones
 const allProducts = useCollection(collection(db, "Celulares"))
 
 
+// Productos similares con imágenes generadas si no tienen
 const similarProducts = computed(() => {
   if (!product.value || !allProducts.value) return []
   
@@ -280,6 +309,18 @@ const similarProducts = computed(() => {
       p.brand === product.value.brand
     )
     .slice(0, 4)
+    .map(p => {
+      if (!p.images || p.images.length === 0) {
+        return {
+          ...p,
+          image: getPlaceholderImage(p.name, p.brand)
+        }
+      }
+      return {
+        ...p,
+        image: p.images[0]
+      }
+    })
 })
 
 
@@ -331,32 +372,6 @@ const goToProduct = (id) => {
   &:hover {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.9) !important;
     border-color: rgba(255, 255, 255, 0.15) !important;
-  }
-}
-
-
-.body--dark .product-detail-no-image {
-  height: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
-  border-radius: 20px;
-}
-
-
-.body--light .product-detail-no-image {
-  height: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-radius: 20px;
-  
-  .text-grey-5, .text-grey-6 {
-    color: #64748b !important;
   }
 }
 
