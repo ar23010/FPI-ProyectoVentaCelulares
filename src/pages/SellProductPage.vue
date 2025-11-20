@@ -141,15 +141,14 @@
               >
                 <div class="q-gutter-md">
                   <div class="text-body1 q-mb-md text-white">
-                    Sube hasta 5 imágenes de tu producto
+                    Sube hasta 3 imágenes de tu producto (se comprimen automáticamente)
                   </div>
                   
                   <q-banner class="bg-info text-white q-mb-md" rounded>
                     <template v-slot:avatar>
                       <q-icon name="info" color="white" />
                     </template>
-                    <strong>Modo de prueba:</strong> Puedes continuar sin imágenes. 
-               
+                    <strong>Optimización automática:</strong> Las imágenes se comprimen automáticamente para Firebase. Máximo 3 imágenes recomendadas.
                   </q-banner>
 
                 
@@ -159,11 +158,11 @@
                     filled
                     multiple
                     accept="image/*"
-                    label="Seleccionar imágenes (opcional para pruebas)"
-                    max-files="5"
+                    label="Seleccionar imágenes (máximo 3 para Firebase)"
+                    max-files="3"
                     counter
                     @update:model-value="handleImageSelection"
-                    hint="Puedes continuar sin imágenes"
+                    hint="Imágenes se comprimen automáticamente"
                     :disable="convertingImages"
                   >
                     <template v-slot:prepend>
@@ -372,79 +371,131 @@ const nextStep = () => {
 }
 
 const handleImageSelection = async () => {
-  if (selectedFiles.value) {
-    convertingImages.value = true
-    formData.value.images = [] 
-    
-    const files = Array.isArray(selectedFiles.value)
-      ? selectedFiles.value
-      : [selectedFiles.value]
-    
-    for (const file of files) {
-      try {
-        const base64 = await convertFileToBase64(file)
-        formData.value.images.push(base64)
-      } catch (error) {
-        console.error('Error converting image to base64:', error)
+  if (!selectedFiles.value) return
+  
+  convertingImages.value = true
+  formData.value.images = []
+  
+  const files = Array.isArray(selectedFiles.value)
+    ? selectedFiles.value.slice(0, 3) // Máximo 3 imágenes
+    : [selectedFiles.value]
+  
+  let totalEstimatedSize = 0
+  
+  for (const file of files) {
+    try {
+      // Validar tamaño del archivo original
+      if (file.size > 10 * 1024 * 1024) { // Máximo 10MB por imagen
         $q.notify({
-          message: 'Error al procesar una imagen',
-          color: 'negative',
+          message: `Imagen ${file.name} es demasiado grande (máximo 10MB)`,
+          color: 'warning',
           position: 'top'
         })
+        continue
       }
+      
+      console.log(`Procesando: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`)
+      
+      const base64 = await convertFileToBase64(file)
+      const estimatedSize = base64.length * 0.75
+      totalEstimatedSize += estimatedSize
+      
+      // Verificar que el tamaño total no exceda ~800KB
+      if (totalEstimatedSize > 800 * 1024) {
+        $q.notify({
+          message: 'Demasiadas imágenes. Límite de tamaño alcanzado.',
+          color: 'warning',
+          position: 'top'
+        })
+        break
+      }
+      
+      formData.value.images.push(base64)
+      
+    } catch (error) {
+      console.error('Error converting image to base64:', error)
+      $q.notify({
+        message: `Error al procesar ${file.name}`,
+        color: 'negative',
+        position: 'top'
+      })
     }
+  }
+  
+  console.log(`Total de imágenes procesadas: ${formData.value.images.length}`)
+  console.log(`Tamaño total estimado: ${(totalEstimatedSize / 1024).toFixed(2)} KB`)
+  
+  convertingImages.value = false
+}
+
+const convertFileToBase64 = async (file) => {
+  try {
+    const compressedBase64 = await compressImage(file)
     
-    convertingImages.value = false
+    console.log(`Imagen comprimida: ${file.name}`)
+    console.log(`Tamaño original: ${(file.size / 1024).toFixed(2)} KB`)
+    console.log(`Tamaño base64 estimado: ${(compressedBase64.length * 0.75 / 1024).toFixed(2)} KB`)
+    
+    return compressedBase64
+  } catch (error) {
+    console.error('Error al comprimir imagen:', error)
+    throw error
   }
 }
 
-const convertFileToBase64 = (file) => {
+const compressImage = (file, maxWidth = 300, quality = 0.4) => {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    
-    reader.onload = (e) => {
-      resolve(e.target.result)
-    }
-    
-    reader.onerror = (error) => {
-      reject(error)
-    }
-    
-    if (file.size > 1024 * 1024) {
-      compressImage(file)
-        .then(compressedFile => {
-          reader.readAsDataURL(compressedFile)
-        })
-        .catch(() => {
-          reader.readAsDataURL(file)
-        })
-    } else {
-      reader.readAsDataURL(file)
-    }
-  })
-}
-
-const compressImage = (file, maxWidth = 800, quality = 0.8) => {
-  return new Promise((resolve) => {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
     const img = new Image()
     
     img.onload = () => {
-      const ratio = Math.min(maxWidth / img.width, maxWidth / img.height)
-      canvas.width = img.width * ratio
-      canvas.height = img.height * ratio
-      
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      
-      canvas.toBlob(resolve, 'image/jpeg', quality)
+      try {
+        let { width, height } = img
+        
+        // Redimensionar manteniendo aspecto pero limitando tamaño máximo
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width
+            width = maxWidth
+          }
+        } else {
+          if (height > maxWidth) {
+            width = (width * maxWidth) / height
+            height = maxWidth
+          }
+        }
+        
+        canvas.width = width
+        canvas.height = height
+        
+        // Dibujar imagen redimensionada
+        ctx.drawImage(img, 0, 0, width, height)
+        
+        // Convertir a JPEG con compresión agresiva
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality)
+        
+        // Verificar si aún es muy grande (más de 100KB estimado)
+        const estimatedSize = compressedBase64.length * 0.75
+        if (estimatedSize > 100 * 1024 && quality > 0.2) {
+          // Comprimir más si es necesario
+          const smallerBase64 = canvas.toDataURL('image/jpeg', 0.2)
+          resolve(smallerBase64)
+        } else {
+          resolve(compressedBase64)
+        }
+      } catch (error) {
+        reject(error)
+      }
+    }
+    
+    img.onerror = () => {
+      reject(new Error('Error al cargar la imagen'))
     }
     
     img.src = URL.createObjectURL(file)
   })
 }
-
-
 
 const removeImage = (index) => {
   formData.value.images.splice(index, 1)
@@ -476,26 +527,27 @@ const submitForm = async () => {
       status: 'active'
     }
     
-    console.log('Intentando guardar en Firebase...', dataToSave)
+    // Validar tamaño del documento antes de enviarlo
+    const docSize = new Blob([JSON.stringify(dataToSave)]).size
+    console.log(`Tamaño del documento: ${(docSize / 1024).toFixed(2)} KB`)
     
-    // Intentar guardar en Firebase si está disponible
+    if (docSize > 1048576) { // 1MB limit
+      throw new Error(`Documento demasiado grande: ${(docSize / 1024).toFixed(2)} KB. Máximo: 1024 KB`)
+    }
+    
+    console.log('Intentando guardar en Firebase...')
+    
+    // Intentar guardar en Firebase
     if (db) {
       try {
         const docRef = await addDoc(collection(db, "Celulares"), dataToSave)
         console.log("Document written with ID: ", docRef.id)
       } catch (firebaseError) {
-        console.warn("Firebase no disponible, guardando localmente:", firebaseError)
-        // Guardar en localStorage como fallback
-        const existingProducts = JSON.parse(localStorage.getItem('products') || '[]')
-        existingProducts.push({ ...dataToSave, id: Date.now() })
-        localStorage.setItem('products', JSON.stringify(existingProducts))
+        console.error("Error de Firebase:", firebaseError)
+        throw firebaseError
       }
     } else {
-      console.log("Firebase no configurado, guardando localmente")
-      // Guardar en localStorage
-      const existingProducts = JSON.parse(localStorage.getItem('products') || '[]')
-      existingProducts.push({ ...dataToSave, id: Date.now() })
-      localStorage.setItem('products', JSON.stringify(existingProducts))
+      throw new Error("Firebase no está configurado")
     }
     
     loading.value = false
@@ -522,13 +574,27 @@ const submitForm = async () => {
     console.error("Error adding document: ", e)
     loading.value = false
     
+    let errorMessage = 'Error al publicar el anuncio'
+    let errorCaption = 'Por favor, intenta de nuevo'
+    
+    if (e.message && e.message.includes('demasiado grande')) {
+      errorMessage = 'Imágenes demasiado grandes'
+      errorCaption = 'Reduce el número de imágenes o usa imágenes más pequeñas'
+    } else if (e.code === 'permission-denied') {
+      errorMessage = 'Sin permisos para guardar'
+      errorCaption = 'Verifica la configuración de Firebase'
+    } else if (e.message && e.message.includes('exceeds the maximum allowed size')) {
+      errorMessage = 'Documento muy grande para Firebase'
+      errorCaption = 'Reduce las imágenes a máximo 2-3 fotos'
+    }
+    
     $q.notify({
-      message: 'Error al publicar el anuncio',
-      caption: e.message || 'Por favor, intenta de nuevo',
+      message: errorMessage,
+      caption: errorCaption,
       color: 'negative',
       icon: 'error',
       position: 'top',
-      timeout: 3000
+      timeout: 5000
     })
   }
 }
